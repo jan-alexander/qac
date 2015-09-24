@@ -11,8 +11,10 @@ std::string to_string(token_enum tenum) {
         TOKEN(ANSWER);
         TOKEN(WORD);
         TOKEN(LATEX_OPENING);
+        TOKEN(LATEX_CENTERED_OPENING);
         TOKEN(LATEX_CODE);
         TOKEN(LATEX_CLOSING);
+        TOKEN(LATEX_CENTERED_CLOSING);
         TOKEN(NEW_LINE);
         TOKEN(EMPTY_LINE);
         TOKEN(UNORDERED_LIST_ITEM);
@@ -30,7 +32,7 @@ int main(int argc, const char* argv[]) {
     if (argc < 3) {
         string exe(argv[0]);
 
-        cerr << "Usage: " << exe.substr(exe.rfind('/') + 1) + " <generator> <qa-file> [<output>]";
+        cerr << "Usage: " << exe.substr(exe.rfind('/') + 1) + " <generator> <qa-file> [<output>]\n";
         return -1;
     }
 
