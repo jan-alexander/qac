@@ -1,0 +1,38 @@
+Q: Ist das hier eine Frage?
+A: Ja, klar.
+
+Q: Wie heißt die Bundeskanzlerin von Deutschland?
+A: Angela Merkel
+
+Q: Wie lauten die ersten drei Quadratzahlen?
+A: -------------
+   | 1 | 2 | 3 |
+   -------------
+   | 1 | 4 | 9 |
+   -------------
+
+Q: Und wie lautet lange Form von \((a+b)^2\)?
+A: \(a^2 + b^2\)
+
+Q: Kann ich auch eine Liste machen?
+A: Ja Klar.
+   - Erstens
+   - Zweitens
+   - Drittens
+
+Q: Und geht das auch ohne ein vorheriges Wort?
+A: - Ich hoffe doch mal
+   - Aber scheint so
+
+Q: Und funktionieren auch geordnete Listen?
+A: #. ja
+   #. Ohne explizite Nummerierung
+
+Q: Auch mit expliziter Nummeriung?
+A: Eigentlich schon.
+   1. Eins
+   2. Zwei
+   3. Drei
+
+Q: Gehen auch zentrierte Latex Anweisungen?
+A: Ja klar: \[a - b\]
