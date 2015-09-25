@@ -24,6 +24,10 @@ std::string to_string(token_enum tenum) {
         TOKEN(TABLE_CELL_RIGHT_ALIGNED);
         TOKEN(TABLE_CELL_CENTER_ALIGNED);
         TOKEN(TABLE_DIVIDER);
+        TOKEN(BOLD_OPENING);
+        TOKEN(BOLD_CLOSING);
+        TOKEN(UNDERLINE_OPENING);
+        TOKEN(UNDERLINE_CLOSING);
     }
 }
 #undef TOKEN

@@ -71,6 +71,24 @@ public:
     token_enum get_closing_token() override { return token_enum::LATEX_CENTERED_CLOSING; }
 };
 
+class lexer_state_bold : public lexer_state {
+public:
+    string get_opening_string_token() override { return "*"; }
+    string get_closing_string_token() override { return "*"; }
+    token_enum get_opening_token() override { return token_enum::BOLD_OPENING; }
+    token_enum get_in_between_token() override { return token_enum::WORD; }
+    token_enum get_closing_token() override { return token_enum::BOLD_CLOSING; }
+};
+
+class lexer_state_underline : public lexer_state {
+public:
+    string get_opening_string_token() override { return "_"; }
+    string get_closing_string_token() override { return "_"; }
+    token_enum get_opening_token() override { return token_enum::UNDERLINE_OPENING; }
+    token_enum get_in_between_token() override { return token_enum::WORD; }
+    token_enum get_closing_token() override { return token_enum::UNDERLINE_CLOSING; }
+};
+
 token::token(token_enum token, const string &value)
     : token_(token), value_(value) {}
 
@@ -89,6 +107,8 @@ string token::get_value() const {
 lexer::lexer() {
     possible_states_.push_back(make_unique<lexer_state_latex>());
     possible_states_.push_back(make_unique<lexer_state_centered_latex>());
+    possible_states_.push_back(make_unique<lexer_state_bold>());
+    possible_states_.push_back(make_unique<lexer_state_underline>());
 }
 
 vector<token> lexer::lex(const char *filename) {
