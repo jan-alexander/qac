@@ -26,6 +26,24 @@ enum class token_enum {
     TABLE_DIVIDER
 };
 
+
+class lexer_state {
+    public:
+        bool matches_opening_token(std::string &word);
+        std::pair<bool, std::string> matches_closing_token(std::string &word);
+
+        virtual token_enum get_opening_token() = 0;
+        virtual token_enum get_in_between_token() = 0;
+        virtual token_enum get_closing_token() = 0;
+        virtual std::string get_opening_string_token() = 0;
+        virtual std::string get_closing_string_token() = 0;
+
+    private:
+        bool ends_with_punctuation(const std::string &word);
+    };
+
+
+
 class token {
 public:
     token(token_enum token, const std::string& value);
@@ -40,6 +58,7 @@ private:
 
 class lexer {
 public:
+    lexer();
     std::vector<token> lex(const char* filename);
 
 private:
@@ -50,6 +69,8 @@ private:
     bool has_nth_char(const size_t& pos, const std::string& line) const;
 
     bool in_latex_ = false;
+    lexer_state *cur_lexer_state_ = nullptr;
+    std::vector<std::unique_ptr<qac::lexer_state>> possible_states_;
 };
 
 }

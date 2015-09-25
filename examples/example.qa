@@ -30,9 +30,9 @@ A: #. ja
 
 Q: Auch mit expliziter Nummeriung?
 A: Eigentlich schon.
-   1. Eins
-   2. Zwei
-   3. Drei
+   10. Eins
+   200. Zwei
+   3000. Drei
 
 Q: Gehen auch zentrierte Latex Anweisungen?
 A: Ja klar: \[a - b\]
