@@ -1,3 +1,7 @@
+CHA: Kapitel
+SEC: Section
+SUB: Subsection
+
 Q: Ist das hier eine Frage?
 A: Ja, klar.
 
@@ -20,7 +24,7 @@ A: Ja Klar.
    - Zweitens
    - Drittens
 
-Q: Und geht das auch ohne ein vorheriges Wort?
+Q: Und geht das `auch ohne` ein vorheriges Wort?
 A: - Ich hoffe doch mal
    - Aber scheint so
 

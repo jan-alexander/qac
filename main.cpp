@@ -28,6 +28,11 @@ std::string to_string(token_enum tenum) {
         TOKEN(BOLD_CLOSING);
         TOKEN(UNDERLINE_OPENING);
         TOKEN(UNDERLINE_CLOSING);
+        TOKEN(CHAPTER);
+        TOKEN(SECTION);
+        TOKEN(SUBSECTION);
+        TOKEN(CODE_OPENING);
+        TOKEN(CODE_CLOSING);
     }
 }
 #undef TOKEN

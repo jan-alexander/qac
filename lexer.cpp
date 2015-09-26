@@ -89,6 +89,15 @@ public:
     token_enum get_closing_token() override { return token_enum::UNDERLINE_CLOSING; }
 };
 
+class lexer_state_code : public lexer_state {
+public:
+    string get_opening_string_token() override { return "`"; }
+    string get_closing_string_token() override { return "`"; }
+    token_enum get_opening_token() override { return token_enum::CODE_OPENING; }
+    token_enum get_in_between_token() override { return token_enum::WORD; }
+    token_enum get_closing_token() override { return token_enum::CODE_CLOSING; }
+};
+
 token::token(token_enum token, const string &value)
     : token_(token), value_(value) {}
 
@@ -109,6 +118,7 @@ lexer::lexer() {
     possible_states_.push_back(make_unique<lexer_state_centered_latex>());
     possible_states_.push_back(make_unique<lexer_state_bold>());
     possible_states_.push_back(make_unique<lexer_state_underline>());
+    possible_states_.push_back(make_unique<lexer_state_code>());
 }
 
 vector<token> lexer::lex(const char *filename) {
@@ -190,6 +200,12 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
                 } else if (word.compare("A:") == 0) {
                     tokens.push_back(token(token_enum::ANSWER, word));
                     was_q_or_a = true;
+                } else if (word.compare("CHA:") == 0) {
+                    tokens.push_back(token(token_enum::CHAPTER, word));
+                } else if (word.compare("SEC:") == 0) {
+                    tokens.push_back(token(token_enum::SECTION, word));
+                } else if (word.compare("SUB:") == 0) {
+                    tokens.push_back(token(token_enum::SUBSECTION, word));
                 } else if (word.compare("-") == 0) {
                     tokens.push_back(token(token_enum::UNORDERED_LIST_ITEM, word));
                 } else if (word.compare("#.") == 0) {
