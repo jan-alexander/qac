@@ -1,5 +1,5 @@
 #include <iostream>
-#include "lexer.h"
+#include "qac/lexer/lexer.h"
 
 using namespace qac;
 using namespace std;
