@@ -28,19 +28,37 @@ enum class node_enum {
 };
 
 class node {
-public:
-    node(node_enum type);
+   public:
+    node(node_enum type) : node(type, "") {}
 
-private:
+    node(node_enum type, std::string value) : type_(type), value_(value) {}
+
+    void add_child(std::unique_ptr<node> child) {
+        children_.push_back(std::move(child));
+    }
+
+    node_enum type() const { return type_; }
+
+    const std::vector<std::unique_ptr<node>> &children() const {
+        return children_;
+    }
+
+    const std::string &value() { return value_; }
+
+   private:
     node_enum type_;
+    std::vector<std::unique_ptr<node>> children_;
+    std::string value_;
 };
 
 class parser {
-public:
-    std::unique_ptr<node> parse(std::vector<token> tokens);
-};
+   public:
+    std::unique_ptr<node> parse(const std::vector<token> &tokens);
 
+   private:
+    std::unique_ptr<node> parse(const std::vector<token> &tokens,
+                                std::vector<token>::const_iterator &current);
+};
 }
 
-
-#endif //QAC_PARSER_H
+#endif  // QAC_PARSER_H

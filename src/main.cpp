@@ -8,7 +8,9 @@
 using namespace qac;
 using namespace std;
 
-#define TOKEN(t) case token_enum::t: return #t
+#define TOKEN(t)        \
+    case token_enum::t: \
+        return #t
 std::string to_string(token_enum tenum) {
     switch (tenum) {
         TOKEN(QUESTION);
@@ -41,11 +43,62 @@ std::string to_string(token_enum tenum) {
 }
 #undef TOKEN
 
-int main(int argc, const char* argv[]) {
+string to_string(node_enum nenum) {
+    switch (nenum) {
+        case node_enum::ROOT:
+            return "ROOT";
+        case node_enum::QUESTION:
+            return "QUESTION";
+        case node_enum::ANSWER:
+            return "ANSWER";
+        default:
+            return ">>UNKNOWN<<";
+    }
+}
+
+void print_token(const vector<token> &tokens) {
+    for (token token : tokens) {
+        cout << "t: " << to_string(token.get_token()) << " "
+             << token.get_value() << endl;
+    }
+}
+
+void print_ast(const node *node, int level = 0, bool last = false,
+               bool l0last = false) {
+    static const string pipe = "│";
+    static const string mux = "├";
+    static const string lmux = "└";
+    static const char nl = '\n';
+
+    cout << level << last << l0last << ": ";
+
+    if (level) {
+        for (int i = 0; i < level - 1; ++i) {
+            cout << (l0last ? " " : pipe) << " ";
+        }
+        cout << (last ? lmux : mux) << "─";
+    }
+
+    const auto &children = node->children();
+    int nr_children = children.size();
+    cout << (nr_children ? "┬" : "") << to_string(node->type()) << nl;
+
+    if (nr_children) {
+        for (int i = 0; i < nr_children - 1; ++i) {
+            print_ast(children[i].get(), level + 1);
+        }
+        print_ast(children[nr_children - 1].get(), level + 1, true,
+                  l0last || level == 0);
+    }
+}
+
+int main(int argc, const char *argv[]) {
     if (argc < 3) {
         string exe(argv[0]);
 
-        cerr << "Usage: " << exe.substr(exe.rfind('/') + 1) + " <generator> <qa-file> [<output>]\n";
+        cerr << "Usage: "
+             << exe.substr(exe.rfind('/') + 1) +
+                    " <generator> <qa-file> [<output>]\n";
         return -1;
     }
 
@@ -60,15 +113,14 @@ int main(int argc, const char* argv[]) {
     try {
         lexer lexer;
         vector<token> tokens = lexer.lex(input_file);
+        print_token(tokens);
 
         parser parser;
         auto root = parser.parse(tokens);
+        print_ast(root.get());
 
-        generator_map.at(generator)->generate(root.get(), input_file, output_file);
-
-        for(token token : tokens) {
-            cout << "t: " << to_string(token.get_token()) << " " << token.get_value() << endl;
-        }
+        generator_map.at(generator)
+            ->generate(root.get(), input_file, output_file);
     } catch (exception &e) {
         cerr << "Error: " << e.what() << endl;
     }
