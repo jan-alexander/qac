@@ -51,6 +51,34 @@ string to_string(node_enum nenum) {
             return "QUESTION";
         case node_enum::ANSWER:
             return "ANSWER";
+        case node_enum::WORD:
+            return "WORD";
+        case node_enum::CHAPTER:
+            return "CHAPTER";
+        case node_enum::SECTION:
+            return "SECTION";
+        case node_enum::SUBSECTION:
+            return "SUBSECTION";
+        case node_enum::LATEX:
+            return "LATEX";
+        case node_enum::CENTERED_LATEX:
+            return "CENTERED_LATEX";
+        case node_enum::UNORDERED_LIST:
+            return "UNORDERED_LIST";
+        case node_enum::UNORDERED_LIST_ITEM:
+            return "UNORDERED_LIST_ITEM";
+        case node_enum::ORDERED_LIST:
+            return "ORDERED_LIST";
+        case node_enum::ORDERED_LIST_ITEM:
+            return "ORDERED_LIST_ITEM";
+        case node_enum::TABLE:
+            return "TABLE";
+        case node_enum::BOLD:
+            return "BOLD";
+        case node_enum::UNDERLINED:
+            return "UNDERLINED";
+        case node_enum::CODE:
+            return "CODE";
         default:
             return ">>UNKNOWN<<";
     }
@@ -69,8 +97,6 @@ void print_ast(const node *node, int level = 0, bool last = false,
     static const string mux = "├";
     static const string lmux = "└";
     static const char nl = '\n';
-
-    cout << level << last << l0last << ": ";
 
     if (level) {
         for (int i = 0; i < level - 1; ++i) {
