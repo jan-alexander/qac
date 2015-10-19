@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <map>
 
 #include "qac/generator/html-generator.h"
@@ -9,9 +10,8 @@ using namespace qac;
 using namespace std;
 
 void print_token(const vector<token> &tokens) {
-    for (token token : tokens) {
-        cout << "t: " << to_string(token.get_token()) << " "
-             << token.get_value() << endl;
+    for (token cur_token : tokens) {
+        cout << cur_token << endl;
     }
 }
 
@@ -61,8 +61,13 @@ int main(int argc, const char *argv[]) {
     generator_map[html_generator::get_name()] = make_unique<html_generator>();
 
     try {
+        std::ifstream input(input_file);
+        if (!input.is_open()) {
+            throw runtime_error("Couldn't open '" + string(input_file) + "'");
+        }
+
         lexer lexer;
-        vector<token> tokens = lexer.lex(input_file);
+        vector<token> tokens = lexer.lex(input);
         print_token(tokens);
 
         parser parser;
