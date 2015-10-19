@@ -7,7 +7,8 @@
 namespace qac {
 
 enum class token_enum {
-    QUESTION = 0,
+    END_OF_FILE = 0,
+    QUESTION,
     ANSWER,
     WORD,
     LATEX_OPENING,
@@ -33,7 +34,6 @@ enum class token_enum {
     SUBSECTION,
     CODE_OPENING,
     CODE_CLOSING,
-    END_OF_FILE
 };
 
 std::string to_string(token_enum tenum);
