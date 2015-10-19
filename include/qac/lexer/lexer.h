@@ -64,7 +64,7 @@ class token {
     token_enum get_token() const;
     std::string get_value() const;
 
-    inline bool operator==(const token& rhs) {
+    inline bool operator==(const token& rhs) const {
         return token_ == rhs.token_ && value_ == rhs.value_ &&
                line_ == rhs.line_;
     }
