@@ -55,7 +55,7 @@ class lexer_state {
 };
 
 class token {
-    friend std::ostream& operator<<(std::ostream& os, token& token);
+    friend std::ostream& operator<<(std::ostream& os, const token& token);
 
    public:
     token(token_enum token, const std::string& value, uint16_t line)
@@ -75,7 +75,7 @@ class token {
     uint16_t line_;
 };
 
-std::ostream& operator<<(std::ostream& os, token& token);
+std::ostream& operator<<(std::ostream& os, const token& token);
 
 class lexer {
    public:

@@ -124,7 +124,7 @@ token_enum token::get_token() const { return token_; }
 
 string token::get_value() const { return value_; }
 
-std::ostream& qac::operator<<(std::ostream& os, token& token) {
+std::ostream& qac::operator<<(std::ostream& os, const token& token) {
     os << token.token_ << "@" << token.line_ << "[" << token.value_ << "]";
     return os;
 }

@@ -26,9 +26,9 @@ TEST_CASE("lexer test", "[lexer]") {
         lexer l;
         std::vector<token> actual = l.lex(ss);
 
-        token a(token_enum::ANSWER, "A:", 3);
-        token b(token_enum::ANSWER, "A:", 2);
-
-        REQUIRE(a == b);
+        REQUIRE(expected.size() == actual.size());
+        for (int i = 0; i < actual.size(); ++i) {
+            REQUIRE(expected[i] == actual[i]);
+        }
     }
 }
