@@ -10,21 +10,27 @@ namespace qac {
 enum class node_enum {
     ROOT,
     QUESTION,
-    ANSWER,
-    WORD,
-    CHAPTER,
-    SECTION,
-    SUBSECTION,
+    QUESTION_TEXT,
+    ANSWER_TEXT,
+    TEXT,
     LATEX,
+    NORMAL_LATEX,
     CENTERED_LATEX,
+    LATEX_BODY,
     UNORDERED_LIST,
     UNORDERED_LIST_ITEM,
     ORDERED_LIST,
     ORDERED_LIST_ITEM,
-    TABLE,
+    LIST_ITEM_TEXT,
     BOLD,
     UNDERLINED,
-    CODE
+    CODE,
+    CHAPTER,
+    SECTION,
+    SUBSECTION,
+    TABLE,
+    TABLE_ROW,
+    TABLE_CELL,
 };
 
 class node {
@@ -56,8 +62,33 @@ class parser {
     std::unique_ptr<node> parse(const std::vector<token> &tokens);
 
    private:
-    std::unique_ptr<node> parse(const std::vector<token> &tokens,
-                                std::vector<token>::const_iterator &current);
+    bool match(token_enum token);
+    token_enum lookahead();
+    void no_rule_found();
+
+    std::unique_ptr<node> parse_root();
+    std::unique_ptr<node> parse_question(bool optional = false);
+    std::unique_ptr<node> parse_question_text(bool optional = false);
+    std::unique_ptr<node> parse_answer_text(bool optional = false);
+    std::unique_ptr<node> parse_text();
+    std::unique_ptr<node> parse_latex();
+    std::unique_ptr<node> parse_normal_latex();
+    std::unique_ptr<node> parse_centered_latex();
+    std::unique_ptr<node> parse_latex_body();
+    std::unique_ptr<node> parse_unordered_list();
+    std::unique_ptr<node> parse_unordered_list_item(bool optional = false);
+    std::unique_ptr<node> parse_ordered_list();
+    std::unique_ptr<node> parse_ordered_list_item(bool optional = false);
+    std::unique_ptr<node> parse_list_item_text(bool optional = false);
+    std::unique_ptr<node> parse_bold();
+    std::unique_ptr<node> parse_underlined();
+    std::unique_ptr<node> parse_code();
+    std::unique_ptr<node> parse_chapter(bool optional = false);
+    std::unique_ptr<node> parse_section(bool optional = false);
+    std::unique_ptr<node> parse_subsection(bool optional = false);
+    std::unique_ptr<node> parse_table();
+    std::unique_ptr<node> parse_table_row(bool optional = false);
+    std::unique_ptr<node> parse_table_cell(bool optional = false);
 };
 }
 

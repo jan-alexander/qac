@@ -49,20 +49,20 @@ string to_string(node_enum nenum) {
             return "ROOT";
         case node_enum::QUESTION:
             return "QUESTION";
-        case node_enum::ANSWER:
-            return "ANSWER";
-        case node_enum::WORD:
-            return "WORD";
-        case node_enum::CHAPTER:
-            return "CHAPTER";
-        case node_enum::SECTION:
-            return "SECTION";
-        case node_enum::SUBSECTION:
-            return "SUBSECTION";
+        case node_enum::QUESTION_TEXT:
+            return "QUESTION_TEXT";
+        case node_enum::ANSWER_TEXT:
+            return "ANSWER_TEXT";
+        case node_enum::TEXT:
+            return "TEXT";
         case node_enum::LATEX:
             return "LATEX";
+        case node_enum::NORMAL_LATEX:
+            return "NORMAL_LATEX";
         case node_enum::CENTERED_LATEX:
             return "CENTERED_LATEX";
+        case node_enum::LATEX_BODY:
+            return "LATEX_BODY";
         case node_enum::UNORDERED_LIST:
             return "UNORDERED_LIST";
         case node_enum::UNORDERED_LIST_ITEM:
@@ -71,14 +71,26 @@ string to_string(node_enum nenum) {
             return "ORDERED_LIST";
         case node_enum::ORDERED_LIST_ITEM:
             return "ORDERED_LIST_ITEM";
-        case node_enum::TABLE:
-            return "TABLE";
+        case node_enum::LIST_ITEM_TEXT:
+            return "LIST_ITEM_TEXT";
         case node_enum::BOLD:
             return "BOLD";
         case node_enum::UNDERLINED:
             return "UNDERLINED";
         case node_enum::CODE:
             return "CODE";
+        case node_enum::CHAPTER:
+            return "CHAPTER";
+        case node_enum::SECTION:
+            return "SECTION";
+        case node_enum::SUBSECTION:
+            return "SUBSECTION";
+        case node_enum::TABLE:
+            return "TABLE";
+        case node_enum::TABLE_ROW:
+            return "TABLE_ROW";
+        case node_enum::TABLE_CELL:
+            return "TABLE_CELL";
         default:
             return ">>UNKNOWN<<";
     }
