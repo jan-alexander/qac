@@ -2,6 +2,8 @@
 
 #include <set>
 
+#include <glog/logging.h>
+
 /*
  * The grammar
  * ===========
@@ -146,6 +148,8 @@ using namespace qac;
 using namespace std;
 
 unique_ptr<node> parser::parse(const std::vector<token> &tokens) {
+    DLOG(INFO) << "Start parsing";
+
     current_ = lookahead_ = cbegin(tokens);
     end_ = cend(tokens);
 

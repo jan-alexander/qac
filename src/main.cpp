@@ -1,3 +1,5 @@
+#include <glog/logging.h>
+
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -43,6 +45,8 @@ void print_ast(const node *node, int level = 0, bool last = false,
 }
 
 int main(int argc, const char *argv[]) {
+    google::InitGoogleLogging(argv[0]);
+
     if (argc < 3) {
         string exe(argv[0]);
 
