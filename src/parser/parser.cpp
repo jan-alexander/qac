@@ -146,11 +146,39 @@ using namespace qac;
 using namespace std;
 
 unique_ptr<node> parser::parse(const std::vector<token> &tokens) {
+    current_ = lookahead_ = cbegin(tokens);
+    end_ = cend(tokens);
+
     return parse_root();
 }
 
-bool parser::match(token_enum token) { return false; }
-token_enum parser::lookahead() { return token_enum::BOLD_CLOSING; }
+bool parser::match(token_enum token) {
+    if (lookahead_->get_token() == token) {
+        current_ = lookahead_;
+        lookahead_++;
+        return true;
+    } else {
+        throw runtime_error("Match failed. Expected " + to_string(token) +
+                            ", but got " + to_string(lookahead_->get_token()) +
+                            ".");
+    }
+
+    return false;
+}
+
+token_enum parser::lookahead() {
+    skip_whitespace();
+    return lookahead_->get_token();
+}
+
+void parser::skip_whitespace() {
+    while (lookahead_ != end_ &&
+           (lookahead_->get_token() == token_enum::NEW_LINE ||
+            lookahead_->get_token() == token_enum::EMPTY_LINE)) {
+        lookahead_++;
+    }
+}
+
 void parser::no_rule_found() { throw runtime_error("No rule found!"); }
 
 std::unique_ptr<node> parser::parse_root() {
@@ -518,7 +546,7 @@ std::unique_ptr<node> parser::parse_table() {
 std::unique_ptr<node> parser::parse_table_row(bool optional) {
     unique_ptr<node> ret = make_unique<node>(node_enum::TABLE_ROW);
 
-    switch(lookahead()) {
+    switch (lookahead()) {
         case token_enum::TABLE_CELL:
         case token_enum::TABLE_CELL_LEFT_ALIGNED:
         case token_enum::TABLE_CELL_RIGHT_ALIGNED:
@@ -529,7 +557,7 @@ std::unique_ptr<node> parser::parse_table_row(bool optional) {
             break;
 
         default:
-            if(!optional) {
+            if (!optional) {
                 no_rule_found();
             }
             break;
@@ -566,4 +594,62 @@ std::unique_ptr<node> parser::parse_table_cell(bool optional) {
     }
 
     return ret;
+}
+
+std::string qac::to_string(qac::node_enum nenum) {
+    switch (nenum) {
+        case node_enum::ROOT:
+            return "ROOT";
+        case node_enum::QUESTION:
+            return "QUESTION";
+        case node_enum::QUESTION_TEXT:
+            return "QUESTION_TEXT";
+        case node_enum::ANSWER_TEXT:
+            return "ANSWER_TEXT";
+        case node_enum::TEXT:
+            return "TEXT";
+        case node_enum::LATEX:
+            return "LATEX";
+        case node_enum::NORMAL_LATEX:
+            return "NORMAL_LATEX";
+        case node_enum::CENTERED_LATEX:
+            return "CENTERED_LATEX";
+        case node_enum::LATEX_BODY:
+            return "LATEX_BODY";
+        case node_enum::UNORDERED_LIST:
+            return "UNORDERED_LIST";
+        case node_enum::UNORDERED_LIST_ITEM:
+            return "UNORDERED_LIST_ITEM";
+        case node_enum::ORDERED_LIST:
+            return "ORDERED_LIST";
+        case node_enum::ORDERED_LIST_ITEM:
+            return "ORDERED_LIST_ITEM";
+        case node_enum::LIST_ITEM_TEXT:
+            return "LIST_ITEM_TEXT";
+        case node_enum::BOLD:
+            return "BOLD";
+        case node_enum::UNDERLINED:
+            return "UNDERLINED";
+        case node_enum::CODE:
+            return "CODE";
+        case node_enum::CHAPTER:
+            return "CHAPTER";
+        case node_enum::SECTION:
+            return "SECTION";
+        case node_enum::SUBSECTION:
+            return "SUBSECTION";
+        case node_enum::TABLE:
+            return "TABLE";
+        case node_enum::TABLE_ROW:
+            return "TABLE_ROW";
+        case node_enum::TABLE_CELL:
+            return "TABLE_CELL";
+        default:
+            return ">>UNKNOWN_NODE<<";
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, node_enum nenum) {
+    os << to_string(nenum);
+    return os;
 }

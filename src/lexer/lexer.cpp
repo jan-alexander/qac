@@ -11,7 +11,8 @@ using namespace std;
 
 bool lexer_state::matches_opening_token(string &word) {
     string opening_token = get_opening_string_token();
-    if (word.length() >= opening_token.length() && boost::starts_with(word, opening_token)) {
+    if (word.length() >= opening_token.length() &&
+        boost::starts_with(word, opening_token)) {
         boost::erase_head(word, static_cast<int>(opening_token.length()));
         return true;
     }
@@ -26,16 +27,19 @@ pair<bool, string> lexer_state::matches_closing_token(string &word) {
         return make_pair<bool, string>(false, string(""));
     }
 
-    if (word.length() >= closing_token.length() && boost::ends_with(word, closing_token)) {
+    if (word.length() >= closing_token.length() &&
+        boost::ends_with(word, closing_token)) {
         boost::erase_tail(word, static_cast<int>(closing_token.length()));
         return make_pair<bool, string>(true, string(""));
     }
 
     if (ends_with_punctuation(word)) {
         string tmp_word = word.substr(0, word.length() - 1);
-        if (tmp_word.length() >= closing_token.length() && boost::ends_with(tmp_word, closing_token)) {
+        if (tmp_word.length() >= closing_token.length() &&
+            boost::ends_with(tmp_word, closing_token)) {
             string punctuation{word[word.length() - 1]};
-            boost::erase_tail(word, static_cast<int>(closing_token.length() + 1));
+            boost::erase_tail(word,
+                              static_cast<int>(closing_token.length() + 1));
             return make_pair<bool, string>(true, string(punctuation));
         }
     }
@@ -54,25 +58,37 @@ bool lexer_state::ends_with_punctuation(const string &word) {
 }
 
 class lexer_state_latex : public lexer_state {
-public:
+   public:
     string get_opening_string_token() override { return "\\("; }
     string get_closing_string_token() override { return "\\)"; }
-    token_enum get_opening_token() override { return token_enum::LATEX_OPENING; }
-    token_enum get_in_between_token() override { return token_enum::LATEX_CODE; }
-    token_enum get_closing_token() override { return token_enum::LATEX_CLOSING; }
+    token_enum get_opening_token() override {
+        return token_enum::LATEX_OPENING;
+    }
+    token_enum get_in_between_token() override {
+        return token_enum::LATEX_CODE;
+    }
+    token_enum get_closing_token() override {
+        return token_enum::LATEX_CLOSING;
+    }
 };
 
 class lexer_state_centered_latex : public lexer_state {
-public:
+   public:
     string get_opening_string_token() override { return "\\["; }
     string get_closing_string_token() override { return "\\]"; }
-    token_enum get_opening_token() override { return token_enum::LATEX_CENTERED_OPENING; }
-    token_enum get_in_between_token() override { return token_enum::LATEX_CODE; }
-    token_enum get_closing_token() override { return token_enum::LATEX_CENTERED_CLOSING; }
+    token_enum get_opening_token() override {
+        return token_enum::LATEX_CENTERED_OPENING;
+    }
+    token_enum get_in_between_token() override {
+        return token_enum::LATEX_CODE;
+    }
+    token_enum get_closing_token() override {
+        return token_enum::LATEX_CENTERED_CLOSING;
+    }
 };
 
 class lexer_state_bold : public lexer_state {
-public:
+   public:
     string get_opening_string_token() override { return "*"; }
     string get_closing_string_token() override { return "*"; }
     token_enum get_opening_token() override { return token_enum::BOLD_OPENING; }
@@ -81,16 +97,20 @@ public:
 };
 
 class lexer_state_underline : public lexer_state {
-public:
+   public:
     string get_opening_string_token() override { return "_"; }
     string get_closing_string_token() override { return "_"; }
-    token_enum get_opening_token() override { return token_enum::UNDERLINE_OPENING; }
+    token_enum get_opening_token() override {
+        return token_enum::UNDERLINE_OPENING;
+    }
     token_enum get_in_between_token() override { return token_enum::WORD; }
-    token_enum get_closing_token() override { return token_enum::UNDERLINE_CLOSING; }
+    token_enum get_closing_token() override {
+        return token_enum::UNDERLINE_CLOSING;
+    }
 };
 
 class lexer_state_code : public lexer_state {
-public:
+   public:
     string get_opening_string_token() override { return "`"; }
     string get_closing_string_token() override { return "`"; }
     token_enum get_opening_token() override { return token_enum::CODE_OPENING; }
@@ -101,17 +121,11 @@ public:
 token::token(token_enum token, const string &value)
     : token_(token), value_(value) {}
 
-bool token::is(token_enum token) const {
-    return token_ == token;
-}
+bool token::is(token_enum token) const { return token_ == token; }
 
-token_enum token::get_token() const {
-    return token_;
-}
+token_enum token::get_token() const { return token_; }
 
-string token::get_value() const {
-    return value_;
-}
+string token::get_value() const { return value_; }
 
 lexer::lexer() {
     possible_states_.push_back(make_unique<lexer_state_latex>());
@@ -154,11 +168,14 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
         auto closes = cur_lexer_state_->matches_closing_token(word);
 
         if (!word.empty()) {
-            tokens.push_back(token(cur_lexer_state_->get_in_between_token(), word));
+            tokens.push_back(
+                token(cur_lexer_state_->get_in_between_token(), word));
         }
 
         if (get<bool>(closes)) {
-            tokens.push_back(token(cur_lexer_state_->get_closing_token(), cur_lexer_state_->get_closing_string_token()));
+            tokens.push_back(
+                token(cur_lexer_state_->get_closing_token(),
+                      cur_lexer_state_->get_closing_string_token()));
 
             auto appended = get<string>(closes);
             if (!appended.empty()) {
@@ -172,24 +189,26 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
     bool first_word = true;
     bool has_table = false;
 
-    for(auto word : words) {
+    for (auto word : words) {
         bool was_q_or_a = false;
 
         if (!cur_lexer_state_) {
             bool lexed_word = false;
-            for (auto& possible_state : possible_states_) {
-                if(possible_state->matches_opening_token(word)) {
+            for (auto &possible_state : possible_states_) {
+                if (possible_state->matches_opening_token(word)) {
                     cur_lexer_state_ = possible_state.get();
                     lexed_word = true;
 
-                    tokens.push_back(token(cur_lexer_state_->get_opening_token(), cur_lexer_state_->get_opening_string_token()));
+                    tokens.push_back(
+                        token(cur_lexer_state_->get_opening_token(),
+                              cur_lexer_state_->get_opening_string_token()));
                     check_for_closing_token(word);
 
                     break;
                 }
             }
 
-            if(lexed_word) {
+            if (lexed_word) {
                 continue;
             }
 
@@ -207,25 +226,33 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
                 } else if (word.compare("SUB:") == 0) {
                     tokens.push_back(token(token_enum::SUBSECTION, word));
                 } else if (word.compare("-") == 0) {
-                    tokens.push_back(token(token_enum::UNORDERED_LIST_ITEM, word));
+                    tokens.push_back(
+                        token(token_enum::UNORDERED_LIST_ITEM, word));
                 } else if (word.compare("#.") == 0) {
-                    tokens.push_back(token(token_enum::ORDERED_LIST_ITEM, word));
+                    tokens.push_back(
+                        token(token_enum::ORDERED_LIST_ITEM, word));
                 } else if (word.compare("|") == 0) {
                     has_table = true;
                     tokens.push_back(token(token_enum::TABLE_CELL, word));
                 } else if (word.compare("|<") == 0) {
                     has_table = true;
-                    tokens.push_back(token(token_enum::TABLE_CELL_LEFT_ALIGNED, word));
+                    tokens.push_back(
+                        token(token_enum::TABLE_CELL_LEFT_ALIGNED, word));
                 } else if (word.compare("|>") == 0) {
                     has_table = true;
-                    tokens.push_back(token(token_enum::TABLE_CELL_RIGHT_ALIGNED, word));
+                    tokens.push_back(
+                        token(token_enum::TABLE_CELL_RIGHT_ALIGNED, word));
                 } else if (word.compare("|-") == 0) {
                     has_table = true;
-                    tokens.push_back(token(token_enum::TABLE_CELL_CENTER_ALIGNED, word));
-                } else if (word.size() >= 3 && boost::starts_with(word, "---")) {
+                    tokens.push_back(
+                        token(token_enum::TABLE_CELL_CENTER_ALIGNED, word));
+                } else if (word.size() >= 3 &&
+                           boost::starts_with(word, "---")) {
                     tokens.push_back(token(token_enum::TABLE_DIVIDER, word));
-                } else if (boost::ends_with(word, ".") && all_of(word.begin(), word.end() - 1, ::isdigit)) {
-                    tokens.push_back(token(token_enum::ORDERED_LIST_ITEM, word));
+                } else if (boost::ends_with(word, ".") &&
+                           all_of(word.begin(), word.end() - 1, ::isdigit)) {
+                    tokens.push_back(
+                        token(token_enum::ORDERED_LIST_ITEM, word));
                 } else {
                     tokens.push_back(token(token_enum::WORD, word));
                 }
@@ -236,13 +263,16 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
                         tokens.push_back(token(token_enum::TABLE_CELL, word));
                     } else if (word.compare("|<") == 0) {
                         has_table = true;
-                        tokens.push_back(token(token_enum::TABLE_CELL_LEFT_ALIGNED, word));
+                        tokens.push_back(
+                            token(token_enum::TABLE_CELL_LEFT_ALIGNED, word));
                     } else if (word.compare("|>") == 0) {
                         has_table = true;
-                        tokens.push_back(token(token_enum::TABLE_CELL_RIGHT_ALIGNED, word));
+                        tokens.push_back(
+                            token(token_enum::TABLE_CELL_RIGHT_ALIGNED, word));
                     } else if (word.compare("|-") == 0) {
                         has_table = true;
-                        tokens.push_back(token(token_enum::TABLE_CELL_CENTER_ALIGNED, word));
+                        tokens.push_back(
+                            token(token_enum::TABLE_CELL_CENTER_ALIGNED, word));
                     } else {
                         tokens.push_back(token(token_enum::WORD, word));
                     }
@@ -262,15 +292,84 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
     tokens.push_back(token(token_enum::NEW_LINE, ""));
 }
 
-bool lexer::next_char_equals(const string &line, const size_t &cur_pos, const char &letter) const {
+bool lexer::next_char_equals(const string &line, const size_t &cur_pos,
+                             const char &letter) const {
     return nth_next_char_equals(1, line, cur_pos, letter);
 }
 
-bool lexer::nth_next_char_equals(const size_t &nth, const string &line, const size_t &cur_pos, const char &letter) const {
+bool lexer::nth_next_char_equals(const size_t &nth, const string &line,
+                                 const size_t &cur_pos,
+                                 const char &letter) const {
     size_t pos = cur_pos + nth;
     return has_nth_char(pos, line) && line.at(pos) == letter;
 }
 
 bool lexer::has_nth_char(const size_t &pos, const std::string &line) const {
     return pos < line.length();
+}
+
+std::string qac::to_string(qac::token_enum tenum) {
+    switch (tenum) {
+        case token_enum::QUESTION:
+            return "QUESTION";
+        case token_enum::ANSWER:
+            return "ANSWER";
+        case token_enum::WORD:
+            return "WORD";
+        case token_enum::LATEX_OPENING:
+            return "LATEX_OPENING";
+        case token_enum::LATEX_CENTERED_OPENING:
+            return "LATEX_CENTERED_OPENING";
+        case token_enum::LATEX_CODE:
+            return "LATEX_CODE";
+        case token_enum::LATEX_CLOSING:
+            return "LATEX_CLOSING";
+        case token_enum::LATEX_CENTERED_CLOSING:
+            return "LATEX_CENTERED_CLOSING";
+        case token_enum::NEW_LINE:
+            return "NEW_LINE";
+        case token_enum::EMPTY_LINE:
+            return "EMPTY_LINE";
+        case token_enum::UNORDERED_LIST_ITEM:
+            return "UNORDERED_LIST_ITEM";
+        case token_enum::ORDERED_LIST_ITEM:
+            return "ORDERED_LIST_ITEM";
+        case token_enum::TABLE_CELL:
+            return "TABLE_CELL";
+        case token_enum::TABLE_CELL_LEFT_ALIGNED:
+            return "TABLE_CELL_LEFT_ALIGNED";
+        case token_enum::TABLE_CELL_RIGHT_ALIGNED:
+            return "TABLE_CELL_RIGHT_ALIGNED";
+        case token_enum::TABLE_CELL_CENTER_ALIGNED:
+            return "TABLE_CELL_CENTER_ALIGNED";
+        case token_enum::TABLE_DIVIDER:
+            return "TABLE_DIVIDER";
+        case token_enum::BOLD_OPENING:
+            return "BOLD_OPENING";
+        case token_enum::BOLD_CLOSING:
+            return "BOLD_CLOSING";
+        case token_enum::UNDERLINE_OPENING:
+            return "UNDERLINE_OPENING";
+        case token_enum::UNDERLINE_CLOSING:
+            return "UNDERLINE_CLOSING";
+        case token_enum::CHAPTER:
+            return "CHAPTER";
+        case token_enum::SECTION:
+            return "SECTION";
+        case token_enum::SUBSECTION:
+            return "SUBSECTION";
+        case token_enum::CODE_OPENING:
+            return "CODE_OPENING";
+        case token_enum::CODE_CLOSING:
+            return "CODE_CLOSING";
+        case token_enum::END_OF_FILE:
+            return "END_OF_FILE";
+        default:
+            return ">>UNKNOWN_TOKEN<<";
+    }
+}
+
+std::ostream &operator<<(std::ostream &os, token_enum tenum) {
+    os << to_string(tenum);
+    return os;
 }

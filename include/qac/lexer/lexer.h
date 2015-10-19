@@ -32,9 +32,12 @@ enum class token_enum {
     SECTION,
     SUBSECTION,
     CODE_OPENING,
-    CODE_CLOSING
+    CODE_CLOSING,
+    END_OF_FILE
 };
 
+std::string to_string(token_enum tenum);
+std::ostream &operator<<(std::ostream &os, token_enum tenum);
 
 class lexer_state {
     public:

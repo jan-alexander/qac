@@ -33,6 +33,9 @@ enum class node_enum {
     TABLE_CELL,
 };
 
+std::string to_string(node_enum nenum);
+std::ostream &operator<<(std::ostream &os, node_enum nenum);
+
 class node {
    public:
     node(node_enum type) : node(type, "") {}
@@ -64,6 +67,7 @@ class parser {
    private:
     bool match(token_enum token);
     token_enum lookahead();
+    void skip_whitespace();
     void no_rule_found();
 
     std::unique_ptr<node> parse_root();
@@ -89,6 +93,10 @@ class parser {
     std::unique_ptr<node> parse_table();
     std::unique_ptr<node> parse_table_row(bool optional = false);
     std::unique_ptr<node> parse_table_cell(bool optional = false);
+
+    std::vector<token>::const_iterator current_;
+    std::vector<token>::const_iterator lookahead_;
+    std::vector<token>::const_iterator end_;
 };
 }
 
