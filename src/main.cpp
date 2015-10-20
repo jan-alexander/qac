@@ -3,6 +3,7 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <set>
 
 #include "qac/generator/html-generator.h"
 #include "qac/lexer/lexer.h"
@@ -18,7 +19,7 @@ void print_token(const vector<token> &tokens) {
 }
 
 void print_ast(const node *node, int level = 0, bool last = false,
-               bool l0last = false) {
+               std::set<int> last_set = {}) {
     static const string pipe = "│";
     static const string mux = "├";
     static const string lmux = "└";
@@ -26,7 +27,8 @@ void print_ast(const node *node, int level = 0, bool last = false,
 
     if (level) {
         for (int i = 0; i < level - 1; ++i) {
-            cout << (l0last ? " " : pipe) << " ";
+            bool in_last_set = last_set.count(i);
+            cout << (in_last_set ? " " : pipe) << " ";
         }
         cout << (last ? lmux : mux) << "─";
     }
@@ -37,10 +39,10 @@ void print_ast(const node *node, int level = 0, bool last = false,
 
     if (nr_children) {
         for (int i = 0; i < nr_children - 1; ++i) {
-            print_ast(children[i].get(), level + 1);
+            print_ast(children[i].get(), level + 1, false, last_set);
         }
-        print_ast(children[nr_children - 1].get(), level + 1, true,
-                  l0last || level == 0);
+        last_set.insert(level);
+        print_ast(children[nr_children - 1].get(), level + 1, true, last_set);
     }
 }
 
