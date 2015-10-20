@@ -1,11 +1,10 @@
 #include "qac/generator/generator.h"
 
+#include <iostream>
+
 using namespace std;
 using namespace qac;
 
-string generator::get_name() {
-    return string("generator");
-}
-
-void generator::generate(node* root, const char *input_file, const char *output_file) {
+void generator::generate(node *root, std::ostream &os) {
+    os << "generator::generate" << endl;
 }
