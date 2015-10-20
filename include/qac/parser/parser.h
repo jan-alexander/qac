@@ -33,8 +33,8 @@ enum class node_enum {
     TABLE_CELL,
 };
 
-std::string to_string(node_enum nenum);
-std::ostream &operator<<(std::ostream &os, node_enum nenum);
+std::string to_string(const node_enum &nenum);
+std::ostream &operator<<(std::ostream &os, const node_enum &nenum);
 
 class node {
    public:
@@ -68,7 +68,7 @@ class parser {
     bool match(token_enum token);
     token_enum lookahead();
     void skip_whitespace();
-    void no_rule_found();
+    void no_rule_found(node_enum nenum);
 
     std::unique_ptr<node> parse_root();
     std::unique_ptr<node> parse_question(bool optional = false);
@@ -97,6 +97,8 @@ class parser {
     std::vector<token>::const_iterator current_;
     std::vector<token>::const_iterator lookahead_;
     std::vector<token>::const_iterator end_;
+
+    uint16_t cur_line_ = 1;
 };
 }
 

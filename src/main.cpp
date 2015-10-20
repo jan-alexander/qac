@@ -12,12 +12,6 @@
 using namespace qac;
 using namespace std;
 
-void print_token(const vector<token> &tokens) {
-    for (token cur_token : tokens) {
-        cout << cur_token << endl;
-    }
-}
-
 void print_ast(const node *node, int level = 0, bool last = false,
                std::set<int> last_set = {}) {
     static const string pipe = "│";
@@ -74,7 +68,6 @@ int main(int argc, const char *argv[]) {
 
         lexer lexer;
         vector<token> tokens = lexer.lex(input);
-        print_token(tokens);
 
         parser parser;
         auto root = parser.parse(tokens);

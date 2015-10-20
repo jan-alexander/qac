@@ -1,6 +1,8 @@
 #include "qac/parser/parser.h"
 
 #include <set>
+#include <iostream>
+#include <sstream>
 
 #include <glog/logging.h>
 
@@ -164,13 +166,18 @@ bool parser::match(token_enum token) {
     if (lookahead_->get_token() == token) {
         DLOG(INFO) << "matched " << token;
         current_ = lookahead_;
+        cur_line_ = current_->line();
         lookahead_++;
         return true;
     } else {
         DLOG(ERROR) << "can't match " << token;
-        throw runtime_error("Match failed. Expected " + to_string(token) +
-                            ", but got " + to_string(lookahead_->get_token()) +
-                            ".");
+
+        std::ostringstream oss;
+
+        oss << "Line " << cur_line_ << ": Match failed. Expected " << token
+            << ", but got " << lookahead_->get_token() << ".";
+
+        throw runtime_error(oss.str());
     }
 
     return false;
@@ -187,10 +194,18 @@ void parser::skip_whitespace() {
            (lookahead_->get_token() == token_enum::NEW_LINE ||
             lookahead_->get_token() == token_enum::EMPTY_LINE)) {
         lookahead_++;
+        cur_line_++;
     }
 }
 
-void parser::no_rule_found() { throw runtime_error("No rule found!"); }
+void parser::no_rule_found(node_enum nenum) {
+    std::ostringstream oss;
+
+    oss << "Line " << cur_line_ << ": Trying to parse " << nenum
+        << ", but found no applicable rule.";
+
+     throw runtime_error(oss.str());
+}
 
 std::unique_ptr<node> parser::parse_root() {
     DLOG(INFO) << "parse_root";
@@ -208,8 +223,8 @@ std::unique_ptr<node> parser::parse_root() {
             break;
 
         default:
-            no_rule_found();
-            break;
+            no_rule_found(node_enum::ROOT);
+            return nullptr;
     }
 
     return ret;
@@ -262,7 +277,8 @@ std::unique_ptr<node> parser::parse_question_text(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found();
+                no_rule_found(node_enum::QUESTION_TEXT);
+                return nullptr;
             }
             break;
     }
@@ -318,7 +334,8 @@ std::unique_ptr<node> parser::parse_answer_text(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found();
+                no_rule_found(node_enum::ANSWER_TEXT);
+                return nullptr;
             }
             break;
     }
@@ -351,8 +368,8 @@ std::unique_ptr<node> parser::parse_latex() {
             break;
 
         default:
-            no_rule_found();
-            break;
+            no_rule_found(node_enum::LATEX);
+            return nullptr;
     }
 
     return ret;
@@ -399,7 +416,8 @@ std::unique_ptr<node> parser::parse_unordered_list() {
         ret->add_child(parse_unordered_list_item());
         ret->add_child(parse_unordered_list_item(true));
     } else {
-        no_rule_found();
+        no_rule_found(node_enum::UNORDERED_LIST);
+        return nullptr;
     }
 
     return ret;
@@ -425,7 +443,8 @@ std::unique_ptr<node> parser::parse_ordered_list() {
         ret->add_child(parse_ordered_list_item());
         ret->add_child(parse_ordered_list_item(true));
     } else {
-        no_rule_found();
+        no_rule_found(node_enum::ORDERED_LIST);
+        return nullptr;
     }
 
     return ret;
@@ -481,7 +500,8 @@ std::unique_ptr<node> parser::parse_list_item_text(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found();
+                no_rule_found(node_enum::LIST_ITEM_TEXT);
+                return nullptr;
             }
             break;
     }
@@ -591,7 +611,8 @@ std::unique_ptr<node> parser::parse_table_row(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found();
+                no_rule_found(node_enum::TABLE_ROW);
+                return nullptr;
             }
             break;
     }
@@ -622,7 +643,8 @@ std::unique_ptr<node> parser::parse_table_cell(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found();
+                no_rule_found(node_enum::TABLE_CELL);
+                return nullptr;
             }
             break;
     }
@@ -630,7 +652,7 @@ std::unique_ptr<node> parser::parse_table_cell(bool optional) {
     return ret;
 }
 
-std::string qac::to_string(qac::node_enum nenum) {
+std::string qac::to_string(const node_enum &nenum) {
     switch (nenum) {
         case node_enum::ROOT:
             return "ROOT";
@@ -683,7 +705,7 @@ std::string qac::to_string(qac::node_enum nenum) {
     }
 }
 
-std::ostream &operator<<(std::ostream &os, node_enum nenum) {
+std::ostream &qac::operator<<(std::ostream &os, const node_enum &nenum) {
     os << to_string(nenum);
     return os;
 }
