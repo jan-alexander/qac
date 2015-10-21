@@ -8,3 +8,11 @@ using namespace qac;
 void generator::generate(node *root, std::ostream &os) {
     os << "generator::generate" << endl;
 }
+
+void generator::render_normal_latex(std::ostream &os, const std::string &text) {
+    os << "\\(" << text << "\\)";
+}
+
+void generator::render_centered_latex(std::ostream &os, const std::string &text) {
+    os << "\\[" << text << "\\]";
+}
