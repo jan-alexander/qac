@@ -32,11 +32,65 @@ enum class cst_node_enum {
 std::string to_string(const cst_node_enum &nenum);
 std::ostream &operator<<(std::ostream &os, const cst_node_enum &nenum);
 
+class cst_root_questions;
+class cst_root_chapters;
+class cst_question;
+class cst_question_text;
+class cst_answer_text;
+class cst_text;
+class cst_latex;
+class cst_normal_latex;
+class cst_centered_latex;
+class cst_latex_body;
+class cst_unordered_list;
+class cst_unordered_list_item;
+class cst_ordered_list;
+class cst_ordered_list_item;
+class cst_list_item_text;
+class cst_bold;
+class cst_underlined;
+class cst_code;
+class cst_chapter;
+class cst_section;
+class cst_subsection;
+class cst_table;
+class cst_table_row;
+class cst_table_cell;
+
+class cst_visitor {
+   public:
+    virtual void visit(cst_root_questions *node) = 0;
+    virtual void visit(cst_root_chapters *node) = 0;
+    virtual void visit(cst_question *node) = 0;
+    virtual void visit(cst_question_text *node) = 0;
+    virtual void visit(cst_answer_text *node) = 0;
+    virtual void visit(cst_text *node) = 0;
+    virtual void visit(cst_latex *node) = 0;
+    virtual void visit(cst_normal_latex *node) = 0;
+    virtual void visit(cst_centered_latex *node) = 0;
+    virtual void visit(cst_latex_body *node) = 0;
+    virtual void visit(cst_unordered_list *node) = 0;
+    virtual void visit(cst_unordered_list_item *node) = 0;
+    virtual void visit(cst_ordered_list *node) = 0;
+    virtual void visit(cst_ordered_list_item *node) = 0;
+    virtual void visit(cst_list_item_text *node) = 0;
+    virtual void visit(cst_bold *node) = 0;
+    virtual void visit(cst_underlined *node) = 0;
+    virtual void visit(cst_code *node) = 0;
+    virtual void visit(cst_chapter *node) = 0;
+    virtual void visit(cst_section *node) = 0;
+    virtual void visit(cst_subsection *node) = 0;
+    virtual void visit(cst_table *node) = 0;
+    virtual void visit(cst_table_row *node) = 0;
+    virtual void visit(cst_table_cell *node) = 0;
+};
+
 class cst_node {
    public:
     cst_node(cst_node_enum type) : cst_node(type, "") {}
 
-    cst_node(cst_node_enum type, std::string value) : type_(type), value_(value) {}
+    cst_node(cst_node_enum type, std::string value)
+        : type_(type), value_(value) {}
 
     void add_child(std::unique_ptr<cst_node> child) {
         children_.push_back(std::move(child));
@@ -50,11 +104,182 @@ class cst_node {
 
     const std::string &value() { return value_; }
 
+    virtual void accept(cst_visitor &visitor) = 0;
+
    private:
     cst_node_enum type_;
     std::vector<std::unique_ptr<cst_node>> children_;
     std::string value_;
 };
+
+class cst_root_questions : public cst_node {
+   public:
+    cst_root_questions() : cst_node(cst_node_enum::ROOT) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_root_chapters : public cst_node {
+   public:
+    cst_root_chapters() : cst_node(cst_node_enum::ROOT) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_question : public cst_node {
+   public:
+    cst_question() : cst_node(cst_node_enum::QUESTION) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_question_text : public cst_node {
+   public:
+    cst_question_text() : cst_node(cst_node_enum::QUESTION_TEXT) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_answer_text : public cst_node {
+   public:
+    cst_answer_text() : cst_node(cst_node_enum::ANSWER_TEXT) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_text : public cst_node {
+   public:
+    cst_text() : cst_node(cst_node_enum::TEXT) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_latex : public cst_node {
+   public:
+    cst_latex() : cst_node(cst_node_enum::LATEX) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_normal_latex : public cst_node {
+   public:
+    cst_normal_latex() : cst_node(cst_node_enum::NORMAL_LATEX) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_centered_latex : public cst_node {
+   public:
+    cst_centered_latex() : cst_node(cst_node_enum::CENTERED_LATEX) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_latex_body : public cst_node {
+   public:
+    cst_latex_body() : cst_node(cst_node_enum::LATEX_BODY) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_unordered_list : public cst_node {
+   public:
+    cst_unordered_list() : cst_node(cst_node_enum::UNORDERED_LIST) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_unordered_list_item : public cst_node {
+   public:
+    cst_unordered_list_item() : cst_node(cst_node_enum::UNORDERED_LIST_ITEM) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_ordered_list : public cst_node {
+   public:
+    cst_ordered_list() : cst_node(cst_node_enum::ORDERED_LIST) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_ordered_list_item : public cst_node {
+   public:
+    cst_ordered_list_item() : cst_node(cst_node_enum::ORDERED_LIST_ITEM) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_list_item_text : public cst_node {
+   public:
+    cst_list_item_text() : cst_node(cst_node_enum::LIST_ITEM_TEXT) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_bold : public cst_node {
+   public:
+    cst_bold() : cst_node(cst_node_enum::BOLD) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_underlined : public cst_node {
+   public:
+    cst_underlined() : cst_node(cst_node_enum::UNDERLINED) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_code : public cst_node {
+   public:
+    cst_code() : cst_node(cst_node_enum::CODE) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_chapter : public cst_node {
+   public:
+    cst_chapter() : cst_node(cst_node_enum::CHAPTER) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_section : public cst_node {
+   public:
+    cst_section() : cst_node(cst_node_enum::SECTION) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_subsection : public cst_node {
+   public:
+    cst_subsection() : cst_node(cst_node_enum::SUBSECTION) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_table : public cst_node {
+   public:
+    cst_table() : cst_node(cst_node_enum::TABLE) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_table_row : public cst_node {
+   public:
+    cst_table_row() : cst_node(cst_node_enum::TABLE_ROW) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_table_cell : public cst_node {
+   public:
+    cst_table_cell() : cst_node(cst_node_enum::TABLE_CELL) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
 }  // namespace qac
 
 #endif  // QAC_CST_NODES_H
