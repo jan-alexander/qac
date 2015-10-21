@@ -149,7 +149,7 @@
 using namespace qac;
 using namespace std;
 
-unique_ptr<node> parser::parse(const std::vector<token> &tokens) {
+unique_ptr<cst_node> parser::parse(const std::vector<token> &tokens) {
     DLOG(INFO) << "Start parsing";
 
     current_ = lookahead_ = cbegin(tokens);
@@ -198,7 +198,7 @@ void parser::skip_whitespace() {
     }
 }
 
-void parser::no_rule_found(node_enum nenum) {
+void parser::no_rule_found(cst_node_enum nenum) {
     std::ostringstream oss;
 
     oss << "Line " << cur_line_ << ": Trying to parse " << nenum
@@ -207,9 +207,9 @@ void parser::no_rule_found(node_enum nenum) {
      throw runtime_error(oss.str());
 }
 
-std::unique_ptr<node> parser::parse_root() {
+std::unique_ptr<cst_node> parser::parse_root() {
     DLOG(INFO) << "parse_root";
-    unique_ptr<node> ret = make_unique<node>(node_enum::ROOT);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::ROOT);
 
     switch (lookahead()) {
         case token_enum::QUESTION:
@@ -223,16 +223,16 @@ std::unique_ptr<node> parser::parse_root() {
             break;
 
         default:
-            no_rule_found(node_enum::ROOT);
+            no_rule_found(cst_node_enum::ROOT);
             return nullptr;
     }
 
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_question(bool optional) {
+std::unique_ptr<cst_node> parser::parse_question(bool optional) {
     DLOG(INFO) << "parse_question optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::QUESTION);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::QUESTION);
 
     if (!optional || lookahead() == token_enum::QUESTION) {
         match(token_enum::QUESTION);
@@ -244,9 +244,9 @@ std::unique_ptr<node> parser::parse_question(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_question_text(bool optional) {
+std::unique_ptr<cst_node> parser::parse_question_text(bool optional) {
     DLOG(INFO) << "parse_question_text optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::QUESTION_TEXT);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::QUESTION_TEXT);
 
     switch (lookahead()) {
         case token_enum::WORD:
@@ -277,7 +277,7 @@ std::unique_ptr<node> parser::parse_question_text(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found(node_enum::QUESTION_TEXT);
+                no_rule_found(cst_node_enum::QUESTION_TEXT);
                 return nullptr;
             }
             break;
@@ -286,9 +286,9 @@ std::unique_ptr<node> parser::parse_question_text(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_answer_text(bool optional) {
+std::unique_ptr<cst_node> parser::parse_answer_text(bool optional) {
     DLOG(INFO) << "parse_answer_text optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::ANSWER_TEXT);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::ANSWER_TEXT);
 
     switch (lookahead()) {
         case token_enum::WORD:
@@ -334,7 +334,7 @@ std::unique_ptr<node> parser::parse_answer_text(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found(node_enum::ANSWER_TEXT);
+                no_rule_found(cst_node_enum::ANSWER_TEXT);
                 return nullptr;
             }
             break;
@@ -343,9 +343,9 @@ std::unique_ptr<node> parser::parse_answer_text(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_text() {
+std::unique_ptr<cst_node> parser::parse_text() {
     DLOG(INFO) << "parse_text";
-    unique_ptr<node> ret = make_unique<node>(node_enum::TEXT);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::TEXT);
 
     do {
         match(token_enum::WORD);
@@ -354,9 +354,9 @@ std::unique_ptr<node> parser::parse_text() {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_latex() {
+std::unique_ptr<cst_node> parser::parse_latex() {
     DLOG(INFO) << "parse_latex";
-    unique_ptr<node> ret = make_unique<node>(node_enum::LATEX);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::LATEX);
 
     switch (lookahead()) {
         case token_enum::LATEX_OPENING:
@@ -368,16 +368,16 @@ std::unique_ptr<node> parser::parse_latex() {
             break;
 
         default:
-            no_rule_found(node_enum::LATEX);
+            no_rule_found(cst_node_enum::LATEX);
             return nullptr;
     }
 
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_normal_latex() {
+std::unique_ptr<cst_node> parser::parse_normal_latex() {
     DLOG(INFO) << "parse_normal_latex";
-    unique_ptr<node> ret = make_unique<node>(node_enum::NORMAL_LATEX);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::NORMAL_LATEX);
 
     match(token_enum::LATEX_OPENING);
     ret->add_child(parse_latex_body());
@@ -386,9 +386,9 @@ std::unique_ptr<node> parser::parse_normal_latex() {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_centered_latex() {
+std::unique_ptr<cst_node> parser::parse_centered_latex() {
     DLOG(INFO) << "parse_centered_latex";
-    unique_ptr<node> ret = make_unique<node>(node_enum::CENTERED_LATEX);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::CENTERED_LATEX);
 
     match(token_enum::LATEX_CENTERED_OPENING);
     ret->add_child(parse_latex_body());
@@ -397,9 +397,9 @@ std::unique_ptr<node> parser::parse_centered_latex() {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_latex_body() {
+std::unique_ptr<cst_node> parser::parse_latex_body() {
     DLOG(INFO) << "parse_latex_body";
-    unique_ptr<node> ret = make_unique<node>(node_enum::LATEX_BODY);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::LATEX_BODY);
 
     do {
         match(token_enum::LATEX_CODE);
@@ -408,24 +408,24 @@ std::unique_ptr<node> parser::parse_latex_body() {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_unordered_list() {
+std::unique_ptr<cst_node> parser::parse_unordered_list() {
     DLOG(INFO) << "parse_unordered_list";
-    unique_ptr<node> ret = make_unique<node>(node_enum::UNORDERED_LIST);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::UNORDERED_LIST);
 
     if (lookahead() == token_enum::UNORDERED_LIST_ITEM) {
         ret->add_child(parse_unordered_list_item());
         ret->add_child(parse_unordered_list_item(true));
     } else {
-        no_rule_found(node_enum::UNORDERED_LIST);
+        no_rule_found(cst_node_enum::UNORDERED_LIST);
         return nullptr;
     }
 
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_unordered_list_item(bool optional) {
+std::unique_ptr<cst_node> parser::parse_unordered_list_item(bool optional) {
     DLOG(INFO) << "parse_unordered_list_item optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::UNORDERED_LIST_ITEM);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::UNORDERED_LIST_ITEM);
 
     if (!optional || lookahead() == token_enum::UNORDERED_LIST_ITEM) {
         match(token_enum::UNORDERED_LIST_ITEM);
@@ -435,24 +435,24 @@ std::unique_ptr<node> parser::parse_unordered_list_item(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_ordered_list() {
+std::unique_ptr<cst_node> parser::parse_ordered_list() {
     DLOG(INFO) << "parse_ordered_list";
-    unique_ptr<node> ret = make_unique<node>(node_enum::ORDERED_LIST);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::ORDERED_LIST);
 
     if (lookahead() == token_enum::ORDERED_LIST_ITEM) {
         ret->add_child(parse_ordered_list_item());
         ret->add_child(parse_ordered_list_item(true));
     } else {
-        no_rule_found(node_enum::ORDERED_LIST);
+        no_rule_found(cst_node_enum::ORDERED_LIST);
         return nullptr;
     }
 
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_ordered_list_item(bool optional) {
+std::unique_ptr<cst_node> parser::parse_ordered_list_item(bool optional) {
     DLOG(INFO) << "parse_ordered_list_item optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::ORDERED_LIST_ITEM);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::ORDERED_LIST_ITEM);
 
     if (!optional || lookahead() == token_enum::ORDERED_LIST_ITEM) {
         match(token_enum::ORDERED_LIST_ITEM);
@@ -462,9 +462,9 @@ std::unique_ptr<node> parser::parse_ordered_list_item(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_list_item_text(bool optional) {
+std::unique_ptr<cst_node> parser::parse_list_item_text(bool optional) {
     DLOG(INFO) << "parse_list_item_text optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::LIST_ITEM_TEXT);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::LIST_ITEM_TEXT);
 
     switch (lookahead()) {
         case token_enum::WORD:
@@ -500,7 +500,7 @@ std::unique_ptr<node> parser::parse_list_item_text(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found(node_enum::LIST_ITEM_TEXT);
+                no_rule_found(cst_node_enum::LIST_ITEM_TEXT);
                 return nullptr;
             }
             break;
@@ -509,9 +509,9 @@ std::unique_ptr<node> parser::parse_list_item_text(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_bold() {
+std::unique_ptr<cst_node> parser::parse_bold() {
     DLOG(INFO) << "parse_bold";
-    unique_ptr<node> ret = make_unique<node>(node_enum::BOLD);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::BOLD);
 
     match(token_enum::BOLD_OPENING);
     ret->add_child(parse_text());
@@ -520,9 +520,9 @@ std::unique_ptr<node> parser::parse_bold() {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_underlined() {
+std::unique_ptr<cst_node> parser::parse_underlined() {
     DLOG(INFO) << "parse_underlined";
-    unique_ptr<node> ret = make_unique<node>(node_enum::UNDERLINED);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::UNDERLINED);
 
     match(token_enum::UNDERLINE_OPENING);
     ret->add_child(parse_text());
@@ -531,9 +531,9 @@ std::unique_ptr<node> parser::parse_underlined() {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_code() {
+std::unique_ptr<cst_node> parser::parse_code() {
     DLOG(INFO) << "parse_code";
-    unique_ptr<node> ret = make_unique<node>(node_enum::CODE);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::CODE);
 
     match(token_enum::CODE_OPENING);
     ret->add_child(parse_text());
@@ -542,9 +542,9 @@ std::unique_ptr<node> parser::parse_code() {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_chapter(bool optional) {
+std::unique_ptr<cst_node> parser::parse_chapter(bool optional) {
     DLOG(INFO) << "parse_chapter optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::CHAPTER);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::CHAPTER);
 
     if (!optional || lookahead() == token_enum::CHAPTER) {
         match(token_enum::CHAPTER);
@@ -556,9 +556,9 @@ std::unique_ptr<node> parser::parse_chapter(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_section(bool optional) {
+std::unique_ptr<cst_node> parser::parse_section(bool optional) {
     DLOG(INFO) << "parse_section optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::SECTION);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::SECTION);
 
     if (!optional || lookahead() == token_enum::SECTION) {
         match(token_enum::SECTION);
@@ -570,9 +570,9 @@ std::unique_ptr<node> parser::parse_section(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_subsection(bool optional) {
+std::unique_ptr<cst_node> parser::parse_subsection(bool optional) {
     DLOG(INFO) << "parse_subsection optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::SUBSECTION);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::SUBSECTION);
 
     if (!optional || lookahead() == token_enum::SUBSECTION) {
         match(token_enum::SUBSECTION);
@@ -584,9 +584,9 @@ std::unique_ptr<node> parser::parse_subsection(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_table() {
+std::unique_ptr<cst_node> parser::parse_table() {
     DLOG(INFO) << "parse_table";
-    unique_ptr<node> ret = make_unique<node>(node_enum::TABLE);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::TABLE);
 
     match(token_enum::TABLE_DIVIDER);
     ret->add_child(parse_table_row());
@@ -595,9 +595,9 @@ std::unique_ptr<node> parser::parse_table() {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_table_row(bool optional) {
+std::unique_ptr<cst_node> parser::parse_table_row(bool optional) {
     DLOG(INFO) << "parse_table_row optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::TABLE_ROW);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::TABLE_ROW);
 
     switch (lookahead()) {
         case token_enum::TABLE_CELL:
@@ -611,7 +611,7 @@ std::unique_ptr<node> parser::parse_table_row(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found(node_enum::TABLE_ROW);
+                no_rule_found(cst_node_enum::TABLE_ROW);
                 return nullptr;
             }
             break;
@@ -620,9 +620,9 @@ std::unique_ptr<node> parser::parse_table_row(bool optional) {
     return ret;
 }
 
-std::unique_ptr<node> parser::parse_table_cell(bool optional) {
+std::unique_ptr<cst_node> parser::parse_table_cell(bool optional) {
     DLOG(INFO) << "parse_table_cell optional? " << optional;
-    unique_ptr<node> ret = make_unique<node>(node_enum::TABLE_CELL);
+    unique_ptr<cst_node> ret = make_unique<cst_node>(cst_node_enum::TABLE_CELL);
 
     switch (lookahead()) {
         case token_enum::TABLE_CELL:
@@ -643,7 +643,7 @@ std::unique_ptr<node> parser::parse_table_cell(bool optional) {
 
         default:
             if (!optional) {
-                no_rule_found(node_enum::TABLE_CELL);
+                no_rule_found(cst_node_enum::TABLE_CELL);
                 return nullptr;
             }
             break;
@@ -652,60 +652,60 @@ std::unique_ptr<node> parser::parse_table_cell(bool optional) {
     return ret;
 }
 
-std::string qac::to_string(const node_enum &nenum) {
+std::string qac::to_string(const cst_node_enum &nenum) {
     switch (nenum) {
-        case node_enum::ROOT:
+        case cst_node_enum::ROOT:
             return "ROOT";
-        case node_enum::QUESTION:
+        case cst_node_enum::QUESTION:
             return "QUESTION";
-        case node_enum::QUESTION_TEXT:
+        case cst_node_enum::QUESTION_TEXT:
             return "QUESTION_TEXT";
-        case node_enum::ANSWER_TEXT:
+        case cst_node_enum::ANSWER_TEXT:
             return "ANSWER_TEXT";
-        case node_enum::TEXT:
+        case cst_node_enum::TEXT:
             return "TEXT";
-        case node_enum::LATEX:
+        case cst_node_enum::LATEX:
             return "LATEX";
-        case node_enum::NORMAL_LATEX:
+        case cst_node_enum::NORMAL_LATEX:
             return "NORMAL_LATEX";
-        case node_enum::CENTERED_LATEX:
+        case cst_node_enum::CENTERED_LATEX:
             return "CENTERED_LATEX";
-        case node_enum::LATEX_BODY:
+        case cst_node_enum::LATEX_BODY:
             return "LATEX_BODY";
-        case node_enum::UNORDERED_LIST:
+        case cst_node_enum::UNORDERED_LIST:
             return "UNORDERED_LIST";
-        case node_enum::UNORDERED_LIST_ITEM:
+        case cst_node_enum::UNORDERED_LIST_ITEM:
             return "UNORDERED_LIST_ITEM";
-        case node_enum::ORDERED_LIST:
+        case cst_node_enum::ORDERED_LIST:
             return "ORDERED_LIST";
-        case node_enum::ORDERED_LIST_ITEM:
+        case cst_node_enum::ORDERED_LIST_ITEM:
             return "ORDERED_LIST_ITEM";
-        case node_enum::LIST_ITEM_TEXT:
+        case cst_node_enum::LIST_ITEM_TEXT:
             return "LIST_ITEM_TEXT";
-        case node_enum::BOLD:
+        case cst_node_enum::BOLD:
             return "BOLD";
-        case node_enum::UNDERLINED:
+        case cst_node_enum::UNDERLINED:
             return "UNDERLINED";
-        case node_enum::CODE:
+        case cst_node_enum::CODE:
             return "CODE";
-        case node_enum::CHAPTER:
+        case cst_node_enum::CHAPTER:
             return "CHAPTER";
-        case node_enum::SECTION:
+        case cst_node_enum::SECTION:
             return "SECTION";
-        case node_enum::SUBSECTION:
+        case cst_node_enum::SUBSECTION:
             return "SUBSECTION";
-        case node_enum::TABLE:
+        case cst_node_enum::TABLE:
             return "TABLE";
-        case node_enum::TABLE_ROW:
+        case cst_node_enum::TABLE_ROW:
             return "TABLE_ROW";
-        case node_enum::TABLE_CELL:
+        case cst_node_enum::TABLE_CELL:
             return "TABLE_CELL";
         default:
             return ">>UNKNOWN_NODE<<";
     }
 }
 
-std::ostream &qac::operator<<(std::ostream &os, const node_enum &nenum) {
+std::ostream &qac::operator<<(std::ostream &os, const cst_node_enum &nenum) {
     os << to_string(nenum);
     return os;
 }

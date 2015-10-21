@@ -5,7 +5,7 @@
 using namespace std;
 using namespace qac;
 
-void generator::generate(node *root, std::ostream &os) {
+void generator::generate(cst_node *root, std::ostream &os) {
     os << "generator::generate" << endl;
 }
 

@@ -13,11 +13,11 @@ using namespace qac;
 using namespace std;
 
 DEFINE_bool(listgenerators, false, "List available generators.");
-DEFINE_bool(printtree, false, "Print parse tree.");
+DEFINE_bool(printcst, false, "Print parse tree.");
 DEFINE_string(generator, "html", "Used generator.");
 DEFINE_string(output, "", "File to write output to.");
 
-void print_ast(const node *node, int level = 0, bool last = false,
+void print_cst(const cst_node *node, int level = 0, bool last = false,
                std::set<int> last_set = {}) {
     static const string pipe = "│";
     static const string mux = "├";
@@ -37,10 +37,10 @@ void print_ast(const node *node, int level = 0, bool last = false,
 
     if (nr_children) {
         for (int i = 0; i < nr_children - 1; ++i) {
-            print_ast(children[i].get(), level + 1, false, last_set);
+            print_cst(children[i].get(), level + 1, false, last_set);
         }
         last_set.insert(level);
-        print_ast(children[nr_children - 1].get(), level + 1, true, last_set);
+        print_cst(children[nr_children - 1].get(), level + 1, true, last_set);
     }
 }
 
@@ -93,8 +93,8 @@ int main(int argc, char *argv[]) {
         parser parser;
         auto root = parser.parse(tokens);
 
-        if (FLAGS_printtree) {
-            print_ast(root.get());
+        if (FLAGS_printcst) {
+            print_cst(root.get());
         }
 
         generator_map.at(FLAGS_generator)

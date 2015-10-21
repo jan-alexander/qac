@@ -12,7 +12,7 @@ class generator {
     virtual std::string get_name() = 0;
     virtual std::string get_description() = 0;
 
-    void generate(qac::node *root, std::ostream &os);
+    void generate(qac::cst_node *root, std::ostream &os);
 
    protected:
     virtual void render_bold(std::ostream &os, const std::string &text) = 0;
