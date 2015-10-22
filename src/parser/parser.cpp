@@ -204,7 +204,7 @@ void parser::no_rule_found(cst_node_enum nenum) {
     oss << "Line " << cur_line_ << ": Trying to parse " << nenum
         << ", but found no applicable rule.";
 
-     throw runtime_error(oss.str());
+    throw runtime_error(oss.str());
 }
 
 std::unique_ptr<cst_node> parser::parse_root() {
@@ -351,6 +351,9 @@ std::unique_ptr<cst_node> parser::parse_text() {
 
     do {
         match(token_enum::WORD);
+
+        cst_text *ptext = dynamic_cast<cst_text*>(ret.get());
+        ptext->add_word(current_->get_value());
     } while (lookahead() == token_enum::WORD);
 
     return ret;
@@ -405,6 +408,9 @@ std::unique_ptr<cst_node> parser::parse_latex_body() {
 
     do {
         match(token_enum::LATEX_CODE);
+
+        cst_latex_body *platex = dynamic_cast<cst_latex_body*>(ret.get());
+        platex->add_word(current_->get_value());
     } while (lookahead() == token_enum::LATEX_CODE);
 
     return ret;

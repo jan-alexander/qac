@@ -14,8 +14,15 @@ using namespace std;
 
 DEFINE_bool(listgenerators, false, "List available generators.");
 DEFINE_bool(printcst, false, "Print parse tree.");
+DEFINE_bool(printtokens, false, "Print lexing tokens.");
 DEFINE_string(generator, "html", "Used generator.");
 DEFINE_string(output, "", "File to write output to.");
+
+void print_tokens(const vector<token> &tokens) {
+    for (token token : tokens) {
+        cout << token << endl;
+    }
+}
 
 void print_cst(const cst_node *node, int level = 0, bool last = false,
                std::set<int> last_set = {}) {
@@ -89,6 +96,9 @@ int main(int argc, char *argv[]) {
 
         lexer lexer;
         vector<token> tokens = lexer.lex(input);
+        if (FLAGS_printtokens) {
+            print_tokens(tokens);
+        }
 
         parser parser;
         auto root = parser.parse(tokens);

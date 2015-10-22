@@ -9,13 +9,6 @@ using namespace std;
 
 std::unique_ptr<ast_node> cst_to_ast_visitor::get_root() { return nullptr; }
 
-std::string cst_to_ast_visitor::text() {
-    std::string text = text_.str();
-    text_.str("");
-    text_.clear();
-    return text;
-}
-
 void cst_to_ast_visitor::visit(cst_root_questions *node) {
     cout << "entering cst_root_questions" << endl;
     for (const auto &child : node->children()) {
@@ -33,83 +26,69 @@ void cst_to_ast_visitor::visit(cst_root_chapters *node) {
 }
 
 void cst_to_ast_visitor::visit(cst_question *node) {
-    // has 3 or 0 children:
+    // has 2 or 0 children:
     //  - question_text
     //  - answer_text
-    //  - question
-    cout << "entering cst_question: size=" << node->children().size() << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
+
+    const std::vector<std::unique_ptr<cst_node>> &children = node->children();
+    if (children.size() == 2) {
+        texts_stack_.push(ostringstream());
+        children[0]->accept(*this);  // question_text
+        string question_text = texts_stack_.top().str();
+        texts_stack_.pop();
+
+        texts_stack_.push(ostringstream());
+        children[1]->accept(*this);  // answer_text
+        string answer_text = texts_stack_.top().str();
+        texts_stack_.pop();
+
+        cout << "Question: " << question_text << " Answer: " << answer_text
+             << endl;
     }
-    cout << "exiting cst_question" << endl;
-
-    // const std::vector<std::unique_ptr<cst_node>> children = node->children();
-    // if (children.size() == 2) {
-    // children[0]->accept(*this); // question_text
-    // string question_text = text();
-
-    // children[1]->accept(*this); // answer_text
-    // string answer_text = text();
-
-    // cout << "Question: " << question_text << " Answer: " << answer_text <<
-    // endl;
-    //}
 }
 
 void cst_to_ast_visitor::visit(cst_question_text *node) {
-    cout << "entering cst_question_text" << endl;
     for (const auto &child : node->children()) {
         child->accept(*this);
     }
-    cout << "exiting cst_question_text" << endl;
 }
 
 void cst_to_ast_visitor::visit(cst_answer_text *node) {
-    cout << "entering cst_answer_text" << endl;
     for (const auto &child : node->children()) {
         child->accept(*this);
     }
-    cout << "exiting cst_answer_text" << endl;
 }
 
 void cst_to_ast_visitor::visit(cst_text *node) {
-    cout << "entering cst_text" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_text" << endl;
+    texts_stack_.top() << node->words() << " ";
 }
 
 void cst_to_ast_visitor::visit(cst_latex *node) {
-    cout << "entering cst_latex" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_latex" << endl;
+    node->children()[0]->accept(*this);
 }
 
 void cst_to_ast_visitor::visit(cst_normal_latex *node) {
-    cout << "entering cst_normal_latex" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_normal_latex" << endl;
+    push_text_stream();
+    node->children()[0]->accept(*this);
+    std::string latex = text_stream().str();
+    pop_text_stream();
+
+    generator_->render_normal_latex(text_stream(), latex);
+    text_stream() << " ";
 }
 
 void cst_to_ast_visitor::visit(cst_centered_latex *node) {
-    cout << "entering cst_centered_latex" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_centered_latex" << endl;
+    push_text_stream();
+    node->children()[0]->accept(*this);
+    std::string latex = text_stream().str();
+    pop_text_stream();
+
+    generator_->render_centered_latex(text_stream(), latex);
+    text_stream() << " ";
 }
 
 void cst_to_ast_visitor::visit(cst_latex_body *node) {
-    cout << "entering cst_latex_body" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_latex_body" << endl;
+    text_stream() << node->words();
 }
 
 void cst_to_ast_visitor::visit(cst_unordered_list *node) {
@@ -153,27 +132,33 @@ void cst_to_ast_visitor::visit(cst_list_item_text *node) {
 }
 
 void cst_to_ast_visitor::visit(cst_bold *node) {
-    cout << "entering cst_bold" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_bold" << endl;
+    push_text_stream();
+    node->children()[0]->accept(*this);
+    std::string bold_text = text_stream().str();
+    pop_text_stream();
+
+    generator_->render_bold(text_stream(), bold_text);
+    text_stream() << " ";
 }
 
 void cst_to_ast_visitor::visit(cst_underlined *node) {
-    cout << "entering cst_underlined" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_underlined" << endl;
+    push_text_stream();
+    node->children()[0]->accept(*this);
+    std::string underlined_text = text_stream().str();
+    pop_text_stream();
+
+    generator_->render_underlined(text_stream(), underlined_text);
+    text_stream() << " ";
 }
 
 void cst_to_ast_visitor::visit(cst_code *node) {
-    cout << "entering cst_code" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_code" << endl;
+    push_text_stream();
+    node->children()[0]->accept(*this);
+    std::string code_text = text_stream().str();
+    pop_text_stream();
+
+    generator_->render_code(text_stream(), code_text);
+    text_stream() << " ";
 }
 
 void cst_to_ast_visitor::visit(cst_chapter *node) {
