@@ -215,13 +215,11 @@ std::unique_ptr<cst_node> parser::parse_root() {
         case token_enum::QUESTION:
             ret = make_unique<cst_root_questions>();
             ret->add_child(parse_question());
-            ret->add_child(parse_question(true));
             break;
 
         case token_enum::CHAPTER:
             ret = make_unique<cst_root_chapters>();
             ret->add_child(parse_chapter());
-            ret->add_child(parse_chapter(true));
             break;
 
         default:
@@ -236,11 +234,15 @@ std::unique_ptr<cst_node> parser::parse_question(bool optional) {
     DLOG(INFO) << "parse_question optional? " << optional;
     unique_ptr<cst_node> ret = make_unique<cst_question>();
 
-    if (!optional || lookahead() == token_enum::QUESTION) {
+    if (lookahead() == token_enum::QUESTION) {
         match(token_enum::QUESTION);
         ret->add_child(parse_question_text());
         match(token_enum::ANSWER);
         ret->add_child(parse_answer_text());
+
+        ret->add_child(parse_question(true));
+    } else if (!optional) {
+        no_rule_found(cst_node_enum::QUESTION);
     }
 
     return ret;
@@ -570,11 +572,14 @@ std::unique_ptr<cst_node> parser::parse_chapter(bool optional) {
     DLOG(INFO) << "parse_chapter optional? " << optional;
     unique_ptr<cst_node> ret = make_unique<cst_chapter>();
 
-    if (!optional || lookahead() == token_enum::CHAPTER) {
+    if (lookahead() == token_enum::CHAPTER) {
         match(token_enum::CHAPTER);
         ret->add_child(parse_text());
         ret->add_child(parse_question(true));
         ret->add_child(parse_section(true));
+        ret->add_child(parse_chapter(true));
+    } else if (!optional) {
+        no_rule_found(cst_node_enum::CHAPTER);
     }
 
     return ret;
@@ -584,11 +589,14 @@ std::unique_ptr<cst_node> parser::parse_section(bool optional) {
     DLOG(INFO) << "parse_section optional? " << optional;
     unique_ptr<cst_node> ret = make_unique<cst_section>();
 
-    if (!optional || lookahead() == token_enum::SECTION) {
+    if (lookahead() == token_enum::SECTION) {
         match(token_enum::SECTION);
         ret->add_child(parse_text());
         ret->add_child(parse_question(true));
         ret->add_child(parse_subsection(true));
+        ret->add_child(parse_section(true));
+    } else if (!optional) {
+        no_rule_found(cst_node_enum::SECTION);
     }
 
     return ret;
@@ -598,11 +606,13 @@ std::unique_ptr<cst_node> parser::parse_subsection(bool optional) {
     DLOG(INFO) << "parse_subsection optional? " << optional;
     unique_ptr<cst_node> ret = make_unique<cst_subsection>();
 
-    if (!optional || lookahead() == token_enum::SUBSECTION) {
+    if (lookahead() == token_enum::SUBSECTION) {
         match(token_enum::SUBSECTION);
         ret->add_child(parse_text());
         ret->add_child(parse_question(true));
         ret->add_child(parse_subsection(true));
+    } else if (!optional) {
+        no_rule_found(cst_node_enum::SUBSECTION);
     }
 
     return ret;
