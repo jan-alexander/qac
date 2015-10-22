@@ -22,9 +22,19 @@ void html_generator::render_code(std::ostream &os, const std::string &text) {
     os << "<code>" << text << "</code>";
 }
 
+void html_generator::render_unordered_list(std::ostream &os,
+                                           const std::string &text) {
+    os << "<ul>" << text << "</ul>";
+}
+
 void html_generator::render_unordered_list_item(std::ostream &os,
                                                 const std::string &text) {
-    os << "<li>" << text << "<li>";
+    os << "<li>" << text << "</li>";
+}
+
+void html_generator::render_ordered_list(std::ostream &os,
+                                         const std::string &text) {
+    os << "<ol>" << text << "</ol>";
 }
 
 void html_generator::render_ordered_list_item(std::ostream &os,

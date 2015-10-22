@@ -17,8 +17,12 @@ class html_generator : public generator {
                                    const std::string &text) override;
     virtual void render_code(std::ostream &os,
                              const std::string &text) override;
+    virtual void render_unordered_list(std::ostream &os,
+                                       const std::string &text) override;
     virtual void render_unordered_list_item(std::ostream &os,
                                             const std::string &text) override;
+    virtual void render_ordered_list(std::ostream &os,
+                                     const std::string &text) override;
     virtual void render_ordered_list_item(std::ostream &os,
                                           const std::string &text) override;
 };

@@ -352,7 +352,7 @@ std::unique_ptr<cst_node> parser::parse_text() {
     do {
         match(token_enum::WORD);
 
-        cst_text *ptext = dynamic_cast<cst_text*>(ret.get());
+        cst_text *ptext = dynamic_cast<cst_text *>(ret.get());
         ptext->add_word(current_->get_value());
     } while (lookahead() == token_enum::WORD);
 
@@ -409,7 +409,7 @@ std::unique_ptr<cst_node> parser::parse_latex_body() {
     do {
         match(token_enum::LATEX_CODE);
 
-        cst_latex_body *platex = dynamic_cast<cst_latex_body*>(ret.get());
+        cst_latex_body *platex = dynamic_cast<cst_latex_body *>(ret.get());
         platex->add_word(current_->get_value());
     } while (lookahead() == token_enum::LATEX_CODE);
 
@@ -422,7 +422,6 @@ std::unique_ptr<cst_node> parser::parse_unordered_list() {
 
     if (lookahead() == token_enum::UNORDERED_LIST_ITEM) {
         ret->add_child(parse_unordered_list_item());
-        ret->add_child(parse_unordered_list_item(true));
     } else {
         no_rule_found(cst_node_enum::UNORDERED_LIST);
         return nullptr;
@@ -435,9 +434,18 @@ std::unique_ptr<cst_node> parser::parse_unordered_list_item(bool optional) {
     DLOG(INFO) << "parse_unordered_list_item optional? " << optional;
     unique_ptr<cst_node> ret = make_unique<cst_unordered_list_item>();
 
-    if (!optional || lookahead() == token_enum::UNORDERED_LIST_ITEM) {
-        match(token_enum::UNORDERED_LIST_ITEM);
-        ret->add_child(parse_list_item_text());
+    switch (lookahead()) {
+        case token_enum::UNORDERED_LIST_ITEM:
+            match(token_enum::UNORDERED_LIST_ITEM);
+            ret->add_child(parse_list_item_text());
+            ret->add_child(parse_unordered_list_item(true));
+            break;
+
+        default:
+            if (!optional) {
+                no_rule_found(cst_node_enum::UNORDERED_LIST_ITEM);
+            }
+            break;
     }
 
     return ret;
@@ -449,7 +457,6 @@ std::unique_ptr<cst_node> parser::parse_ordered_list() {
 
     if (lookahead() == token_enum::ORDERED_LIST_ITEM) {
         ret->add_child(parse_ordered_list_item());
-        ret->add_child(parse_ordered_list_item(true));
     } else {
         no_rule_found(cst_node_enum::ORDERED_LIST);
         return nullptr;
@@ -462,9 +469,18 @@ std::unique_ptr<cst_node> parser::parse_ordered_list_item(bool optional) {
     DLOG(INFO) << "parse_ordered_list_item optional? " << optional;
     unique_ptr<cst_node> ret = make_unique<cst_ordered_list_item>();
 
-    if (!optional || lookahead() == token_enum::ORDERED_LIST_ITEM) {
-        match(token_enum::ORDERED_LIST_ITEM);
-        ret->add_child(parse_list_item_text());
+    switch (lookahead()) {
+        case token_enum::ORDERED_LIST_ITEM:
+            match(token_enum::ORDERED_LIST_ITEM);
+            ret->add_child(parse_list_item_text());
+            ret->add_child(parse_ordered_list_item(true));
+            break;
+
+        default:
+            if (!optional) {
+                no_rule_found(cst_node_enum::ORDERED_LIST_ITEM);
+            }
+            break;
     }
 
     return ret;

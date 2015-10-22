@@ -8,6 +8,8 @@
 #include <sstream>
 #include <stack>
 
+#include <boost/algorithm/string.hpp>
+
 namespace qac {
 
 class generator;
@@ -45,16 +47,15 @@ class cst_to_ast_visitor : public cst_visitor {
    private:
     std::string text();
 
-    void push_text_stream() {
-        texts_stack_.push(std::ostringstream());
-    }
+    void push_text_stream() { texts_stack_.push(std::ostringstream()); }
 
-    void pop_text_stream() {
-        texts_stack_.pop();
-    }
+    void pop_text_stream() { texts_stack_.pop(); }
 
-    std::ostringstream &text_stream() {
-        return texts_stack_.top();
+    std::ostringstream &text_stream() { return texts_stack_.top(); }
+
+    std::string &trim(std::string &string) {
+        boost::algorithm::trim(string);
+        return string;
     }
 
     std::stack<std::ostringstream> texts_stack_;

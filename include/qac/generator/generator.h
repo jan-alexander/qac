@@ -15,10 +15,17 @@ class generator {
     void generate(qac::cst_node *root, std::ostream &os);
 
     virtual void render_bold(std::ostream &os, const std::string &text) = 0;
-    virtual void render_underlined(std::ostream &os, const std::string &text) = 0;
+    virtual void render_underlined(std::ostream &os,
+                                   const std::string &text) = 0;
     virtual void render_code(std::ostream &os, const std::string &text) = 0;
-    virtual void render_unordered_list_item(std::ostream &os, const std::string &text) = 0;
-    virtual void render_ordered_list_item(std::ostream &os, const std::string &text) = 0;
+    virtual void render_unordered_list(std::ostream &os,
+                                       const std::string &text) = 0;
+    virtual void render_unordered_list_item(std::ostream &os,
+                                            const std::string &text) = 0;
+    virtual void render_ordered_list(std::ostream &os,
+                                     const std::string &text) = 0;
+    virtual void render_ordered_list_item(std::ostream &os,
+                                          const std::string &text) = 0;
 
     void render_normal_latex(std::ostream &os, const std::string &text);
     void render_centered_latex(std::ostream &os, const std::string &text);

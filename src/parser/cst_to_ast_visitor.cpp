@@ -26,10 +26,6 @@ void cst_to_ast_visitor::visit(cst_root_chapters *node) {
 }
 
 void cst_to_ast_visitor::visit(cst_question *node) {
-    // has 2 or 0 children:
-    //  - question_text
-    //  - answer_text
-
     const std::vector<std::unique_ptr<cst_node>> &children = node->children();
     if (children.size() == 2) {
         texts_stack_.push(ostringstream());
@@ -73,7 +69,7 @@ void cst_to_ast_visitor::visit(cst_normal_latex *node) {
     std::string latex = text_stream().str();
     pop_text_stream();
 
-    generator_->render_normal_latex(text_stream(), latex);
+    generator_->render_normal_latex(text_stream(), trim(latex));
     text_stream() << " ";
 }
 
@@ -83,7 +79,7 @@ void cst_to_ast_visitor::visit(cst_centered_latex *node) {
     std::string latex = text_stream().str();
     pop_text_stream();
 
-    generator_->render_centered_latex(text_stream(), latex);
+    generator_->render_centered_latex(text_stream(), trim(latex));
     text_stream() << " ";
 }
 
@@ -92,43 +88,60 @@ void cst_to_ast_visitor::visit(cst_latex_body *node) {
 }
 
 void cst_to_ast_visitor::visit(cst_unordered_list *node) {
-    cout << "entering cst_unordered_list" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_unordered_list" << endl;
+    push_text_stream();
+    node->children()[0]->accept(*this);
+    string list_items = text_stream().str();
+    pop_text_stream();
+
+    generator_->render_unordered_list(text_stream(), trim(list_items));
 }
 
 void cst_to_ast_visitor::visit(cst_unordered_list_item *node) {
-    cout << "entering cst_unordered_list_item" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
+    const auto &children = node->children();
+    if (children.size() == 2) {
+        push_text_stream();
+        children[0]->accept(*this);
+        string list_item = text_stream().str();
+        pop_text_stream();
+
+        generator_->render_unordered_list_item(text_stream(), trim(list_item));
+        children[1]->accept(*this);
     }
-    cout << "exiting cst_unordered_list_item" << endl;
 }
 
 void cst_to_ast_visitor::visit(cst_ordered_list *node) {
-    cout << "entering cst_ordered_list" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
-    cout << "exiting cst_ordered_list" << endl;
+    push_text_stream();
+    node->children()[0]->accept(*this);
+    string list_items = text_stream().str();
+    pop_text_stream();
+
+    generator_->render_ordered_list(text_stream(), trim(list_items));
 }
 
 void cst_to_ast_visitor::visit(cst_ordered_list_item *node) {
-    cout << "entering cst_ordered_list_item" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
+    const auto &children = node->children();
+    if (children.size() == 2) {
+        push_text_stream();
+        children[0]->accept(*this);
+        string list_item = text_stream().str();
+        pop_text_stream();
+
+        generator_->render_ordered_list_item(text_stream(), trim(list_item));
+        children[1]->accept(*this);
     }
-    cout << "exiting cst_ordered_list_item" << endl;
 }
 
 void cst_to_ast_visitor::visit(cst_list_item_text *node) {
-    cout << "entering cst_list_item_text" << endl;
-    for (const auto &child : node->children()) {
-        child->accept(*this);
+    const std::vector<std::unique_ptr<cst_node>> &children = node->children();
+    if (children.size() == 2) {
+        push_text_stream();
+        children[0]->accept(*this);
+        children[1]->accept(*this);
+        string list_item_text = text_stream().str();
+        pop_text_stream();
+
+        text_stream() << list_item_text;
     }
-    cout << "exiting cst_list_item_text" << endl;
 }
 
 void cst_to_ast_visitor::visit(cst_bold *node) {
@@ -137,7 +150,7 @@ void cst_to_ast_visitor::visit(cst_bold *node) {
     std::string bold_text = text_stream().str();
     pop_text_stream();
 
-    generator_->render_bold(text_stream(), bold_text);
+    generator_->render_bold(text_stream(), trim(bold_text));
     text_stream() << " ";
 }
 
@@ -147,7 +160,7 @@ void cst_to_ast_visitor::visit(cst_underlined *node) {
     std::string underlined_text = text_stream().str();
     pop_text_stream();
 
-    generator_->render_underlined(text_stream(), underlined_text);
+    generator_->render_underlined(text_stream(), trim(underlined_text));
     text_stream() << " ";
 }
 
@@ -157,7 +170,7 @@ void cst_to_ast_visitor::visit(cst_code *node) {
     std::string code_text = text_stream().str();
     pop_text_stream();
 
-    generator_->render_code(text_stream(), code_text);
+    generator_->render_code(text_stream(), trim(code_text));
     text_stream() << " ";
 }
 
