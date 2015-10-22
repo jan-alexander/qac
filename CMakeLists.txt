@@ -12,6 +12,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 set(HEADER_FILES
     include/qac/lexer/lexer.h
     include/qac/parser/parser.h
+    include/qac/parser/cst_nodes.h
+    include/qac/parser/ast_nodes.h
+    include/qac/parser/cst_to_ast_visitor.h
     include/qac/generator/generator.h
     include/qac/generator/html-generator.h
 )
@@ -19,6 +22,7 @@ set(HEADER_FILES
 set(COMMON_SOURCE_FILES
     src/lexer/lexer.cpp
     src/parser/parser.cpp
+    src/parser/cst_to_ast_visitor.cpp
     src/generator/generator.cpp
     src/generator/html-generator.cpp
 )

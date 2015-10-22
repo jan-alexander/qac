@@ -1,6 +1,11 @@
 #ifndef QAC_CST_NODES_H
 #define QAC_CST_NODES_H
 
+#include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
+
 namespace qac {
 
 enum class cst_node_enum {
