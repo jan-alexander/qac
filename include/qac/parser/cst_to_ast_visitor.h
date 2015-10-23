@@ -14,8 +14,19 @@ namespace qac {
 
 class generator;
 
+enum class cst_to_ast_visitor_state {
+    IN_ROOT,
+    IN_CHAPTER,
+    IN_SECTION,
+    IN_SUBSECTION
+};
+
 class cst_to_ast_visitor : public cst_visitor {
    public:
+    using chapter_stack = std::stack<ast_chapter::ptr>;
+    using section_stack = std::stack<ast_section::ptr>;
+    using subsection_stack = std::stack<ast_subsection::ptr>;
+
     cst_to_ast_visitor(generator *generator) : generator_(generator) {}
     std::unique_ptr<ast_node> get_root();
 
@@ -45,12 +56,8 @@ class cst_to_ast_visitor : public cst_visitor {
     virtual void visit(cst_table_cell *node) override;
 
    private:
-    std::string text();
-
     void push_text_stream() { texts_stack_.push(std::ostringstream()); }
-
     void pop_text_stream() { texts_stack_.pop(); }
-
     std::ostringstream &text_stream() { return texts_stack_.top(); }
 
     std::string &trim(std::string &string) {
@@ -58,8 +65,23 @@ class cst_to_ast_visitor : public cst_visitor {
         return string;
     }
 
+    cst_to_ast_visitor_state state_ = cst_to_ast_visitor_state::IN_ROOT;
+
     std::stack<std::ostringstream> texts_stack_;
+    chapter_stack chapter_stack_;
+    section_stack section_stack_;
+    subsection_stack subsection_stack_;
+
     generator *generator_;
+
+    uint16_t nth_chapter_ = 0;
+    uint16_t nth_question_ = 0;
+
+    const bool LOG_VISIT = true;
+    const bool LOG_QUESTION = true;
+    const bool LOG_CHAPTER = true;
+    const bool LOG_SECTION = true;
+    const bool LOG_SUBSECTION = true;
 };
 
 }  // namespace qac
