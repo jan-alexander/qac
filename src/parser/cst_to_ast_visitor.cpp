@@ -7,15 +7,12 @@
 using namespace qac;
 using namespace std;
 
-std::unique_ptr<ast_node> cst_to_ast_visitor::get_root() { return nullptr; }
-
 void cst_to_ast_visitor::visit(cst_root_questions *node) {
     DLOG_IF(INFO, LOG_VISIT) << "entering cst_root_questions size: "
                              << node->children().size();
 
-    for (const auto &child : node->children()) {
-        child->accept(*this);
-    }
+    root_ = make_unique<ast_root_questions>();
+    node->children()[0]->accept(*this);
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_root_questions";
 }
@@ -24,6 +21,7 @@ void cst_to_ast_visitor::visit(cst_root_chapters *node) {
     DLOG_IF(INFO, LOG_VISIT) << "entering cst_root_chapters size: "
                              << node->children().size();
 
+    root_ = make_unique<ast_root_chapters>();
     node->children()[0]->accept(*this);
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_root_chapters";
@@ -45,9 +43,38 @@ void cst_to_ast_visitor::visit(cst_question *node) {
         string answer_text = texts_stack_.top().str();
         texts_stack_.pop();
 
-        DLOG_IF(INFO, LOG_QUESTION) << "Question " << ++nth_question_ << ": "
-                                    << question_text
+        ast_question::ptr question = make_unique<ast_question>(
+            ++nth_question_, question_text, answer_text);
+
+        question->chapter(chapter_.get());
+        question->section(section_.get());
+        question->subsection(subsection_.get());
+
+        switch (state_) {
+            case cst_to_ast_visitor_state::IN_ROOT:
+                reinterpret_cast<ast_root_questions *>(root_.get())
+                    ->add_question(std::move(question));
+                break;
+
+            case cst_to_ast_visitor_state::IN_CHAPTER:
+                chapter_->add_question(std::move(question));
+                break;
+
+            case cst_to_ast_visitor_state::IN_SECTION:
+                section_->add_question(std::move(question));
+                break;
+
+            case cst_to_ast_visitor_state::IN_SUBSECTION:
+                subsection_->add_question(std::move(question));
+                break;
+        }
+
+        DLOG_IF(INFO, LOG_QUESTION) << nth_chapter_ << "-" << nth_section_
+                                    << "-" << nth_subsection_ << " Question "
+                                    << nth_question_ << ": " << question_text
                                     << " Answer: " << answer_text;
+
+        children[2]->accept(*this);  // following questions
     }
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_question";
@@ -268,19 +295,24 @@ void cst_to_ast_visitor::visit(cst_chapter *node) {
         push_text_stream();
         children[0]->accept(*this);  // caption
         std::string caption = text_stream().str();
-        DLOG(INFO) << "Chapter " << ++nth_chapter_ << " caption: " << caption;
         pop_text_stream();
 
-        // nth_section = 0;
-
-        // push chapter
         state_ = cst_to_ast_visitor_state::IN_CHAPTER;
+        chapter_ = make_unique<ast_chapter>(++nth_chapter_, caption);
+        nth_section_ = 0;
+        nth_subsection_ = 0;
 
-        for (decltype(children.size()) i = 1; i < 4; ++i) {
-            children[i]->accept(*this);
-        }
+        DLOG_IF(INFO, LOG_CHAPTER) << "Chapter " << nth_chapter_ << ": "
+                                   << caption;
 
-        // pop chapter
+        children[1]->accept(*this);  // questions
+        children[2]->accept(*this);  // sections
+
+        reinterpret_cast<ast_root_chapters *>(root_.get())
+            ->add_chapter(std::move(chapter_));
+        chapter_.reset();
+
+        children[3]->accept(*this);  // following chapters
     }
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_chapter";
@@ -295,19 +327,22 @@ void cst_to_ast_visitor::visit(cst_section *node) {
         push_text_stream();
         children[0]->accept(*this);  // caption
         std::string caption = text_stream().str();
-        DLOG(INFO) << "Section "
-                   << "---"
-                   << " caption: " << caption;
         pop_text_stream();
 
-        // push section
         state_ = cst_to_ast_visitor_state::IN_SECTION;
+        section_ = make_unique<ast_section>(++nth_section_, caption);
+        nth_subsection_ = 0;
 
-        for (decltype(children.size()) i = 1; i < 4; ++i) {
-            children[i]->accept(*this);
-        }
+        DLOG_IF(INFO, LOG_SECTION) << nth_chapter_ << " Section "
+                                   << nth_section_ << ": " << caption;
 
-        // pop section
+        children[1]->accept(*this);  // questions
+        children[2]->accept(*this);  // subsections
+
+        chapter_->add_section(std::move(section_));
+        section_.reset();
+
+        children[3]->accept(*this);  // following sections
     }
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_section";
@@ -322,18 +357,21 @@ void cst_to_ast_visitor::visit(cst_subsection *node) {
         push_text_stream();
         children[0]->accept(*this);  // caption
         std::string caption = text_stream().str();
-        DLOG(INFO) << "Subsection "
-                   << "---"
-                   << " caption: " << caption;
         pop_text_stream();
 
-        // push subsection
         state_ = cst_to_ast_visitor_state::IN_SUBSECTION;
+        subsection_ = make_unique<ast_subsection>(++nth_subsection_, caption);
+
+        DLOG_IF(INFO, LOG_SUBSECTION) << nth_chapter_ << "-" << nth_section_
+                                      << " Subsection " << nth_subsection_
+                                      << ": " << caption;
 
         children[1]->accept(*this);  // questions
-        children[2]->accept(*this);  // following subsections
 
-        // pop subsection
+        section_->add_subsection(std::move(subsection_));
+        subsection_.reset();
+
+        children[2]->accept(*this);  // following subsections
     }
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_subsection";

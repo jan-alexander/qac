@@ -23,12 +23,10 @@ enum class cst_to_ast_visitor_state {
 
 class cst_to_ast_visitor : public cst_visitor {
    public:
-    using chapter_stack = std::stack<ast_chapter::ptr>;
-    using section_stack = std::stack<ast_section::ptr>;
-    using subsection_stack = std::stack<ast_subsection::ptr>;
+    using texts_stack = std::stack<std::ostringstream>;
 
     cst_to_ast_visitor(generator *generator) : generator_(generator) {}
-    std::unique_ptr<ast_node> get_root();
+    ast_node::ptr root() { return std::move(root_); }
 
     virtual void visit(cst_root_questions *node) override;
     virtual void visit(cst_root_chapters *node) override;
@@ -67,14 +65,19 @@ class cst_to_ast_visitor : public cst_visitor {
 
     cst_to_ast_visitor_state state_ = cst_to_ast_visitor_state::IN_ROOT;
 
-    std::stack<std::ostringstream> texts_stack_;
-    chapter_stack chapter_stack_;
-    section_stack section_stack_;
-    subsection_stack subsection_stack_;
+    ast_node::ptr root_;
+
+    texts_stack texts_stack_;
 
     generator *generator_;
 
+    ast_chapter::ptr chapter_;
+    ast_section::ptr section_;
+    ast_subsection::ptr subsection_;
+
     uint16_t nth_chapter_ = 0;
+    uint16_t nth_section_ = 0;
+    uint16_t nth_subsection_ = 0;
     uint16_t nth_question_ = 0;
 
     const bool LOG_VISIT = true;

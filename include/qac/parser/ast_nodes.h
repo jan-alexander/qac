@@ -49,6 +49,10 @@ class ast_question : public ast_node {
 
     const std::string &answer() const { return answer_; }
 
+    void chapter(ast_chapter *chapter) { chapter_ = chapter; }
+    void section(ast_section *section) { section_ = section; }
+    void subsection(ast_subsection *subsection) { subsection_ = subsection; }
+
    private:
     std::string question_;
     std::string answer_;
@@ -101,6 +105,10 @@ class ast_section : public ast_node, public has_questions {
         : ast_node(ast_node_enum::SECTION),
           nth_section_(nth),
           section_(section) {}
+
+    void add_subsection(ast_subsection::ptr subsection) {
+        subsections_.push_back(std::move(subsection));
+    }
 
    private:
     std::string section_;

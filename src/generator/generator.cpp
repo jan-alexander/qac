@@ -13,7 +13,7 @@ void generator::generate(cst_node *root, std::ostream &os) {
 
     root->accept(visitor);
 
-    auto ast_root = visitor.get_root();
+    auto ast_root = visitor.root();
 }
 
 void generator::render_normal_latex(std::ostream &os, const std::string &text) {
