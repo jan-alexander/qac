@@ -20,6 +20,23 @@ enum class ast_node_enum {
     SUBSECTION
 };
 
+class ast_chapter;
+class ast_question;
+class ast_root_chapters;
+class ast_root_questions;
+class ast_section;
+class ast_subsection;
+
+class ast_visitor {
+   public:
+    virtual void visit(ast_chapter *node) = 0;
+    virtual void visit(ast_question *node) = 0;
+    virtual void visit(ast_root_chapters *node) = 0;
+    virtual void visit(ast_root_questions *node) = 0;
+    virtual void visit(ast_section *node) = 0;
+    virtual void visit(ast_subsection *node) = 0;
+};
+
 class ast_node {
    public:
     using ptr = std::unique_ptr<ast_node>;
@@ -27,6 +44,8 @@ class ast_node {
     ast_node(ast_node_enum type) : type_(type) {}
 
     ast_node_enum type() const { return type_; }
+
+    virtual void accept(ast_visitor &visitor) = 0;
 
    private:
     ast_node_enum type_;
@@ -52,6 +71,8 @@ class ast_question : public ast_node {
     void chapter(ast_chapter *chapter) { chapter_ = chapter; }
     void section(ast_section *section) { section_ = section; }
     void subsection(ast_subsection *subsection) { subsection_ = subsection; }
+
+    virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
 
    private:
     std::string question_;
@@ -87,6 +108,10 @@ class ast_subsection : public ast_node, public has_questions {
           nth_subsection_(nth),
           subsection_(subsection) {}
 
+    const std::string &subsection() const { return subsection_; }
+
+    virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
+
    private:
     std::string subsection_;
 
@@ -106,9 +131,15 @@ class ast_section : public ast_node, public has_questions {
           nth_section_(nth),
           section_(section) {}
 
+    const std::string &section() const { return section_; }
+
     void add_subsection(ast_subsection::ptr subsection) {
         subsections_.push_back(std::move(subsection));
     }
+
+    const subsection_vector &subsections() const { return subsections_; }
+
+    virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
 
    private:
     std::string section_;
@@ -140,6 +171,8 @@ class ast_chapter : public ast_node, public has_questions {
 
     const section_vector &sections() const { return sections_; }
 
+    virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
+
    private:
     std::string chapter_;
 
@@ -153,6 +186,8 @@ class ast_root_questions : public ast_node, public has_questions {
     using ptr = std::unique_ptr<ast_root_questions>;
 
     ast_root_questions() : ast_node(ast_node_enum::ROOT_QUESTIONS) {}
+
+    virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
 };
 
 class ast_root_chapters : public ast_node {
@@ -167,6 +202,8 @@ class ast_root_chapters : public ast_node {
     }
 
     const chapter_vector &chapters() const { return chapters_; }
+
+    virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
 
    private:
     chapter_vector chapters_;
