@@ -381,8 +381,14 @@ void cst_to_ast_visitor::visit(cst_table *node) {
     DLOG_IF(INFO, LOG_VISIT) << "entering cst_table size: "
                              << node->children().size();
 
-    for (const auto &child : node->children()) {
-        child->accept(*this);
+    const auto &children = node->children();
+    if (children.size() == 1) {
+        push_text_stream();
+        children[0]->accept(*this);  // 0: row
+        string rows = text_stream().str();
+        pop_text_stream();
+
+        generator_->render_table(text_stream(), trim(rows));
     }
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_table";
@@ -392,8 +398,16 @@ void cst_to_ast_visitor::visit(cst_table_row *node) {
     DLOG_IF(INFO, LOG_VISIT) << "entering cst_table_row size: "
                              << node->children().size();
 
-    for (const auto &child : node->children()) {
-        child->accept(*this);
+    const auto &children = node->children();
+    if (children.size() == 2) {
+        push_text_stream();
+        children[0]->accept(*this);  // 0: cell
+        string cells = text_stream().str();
+        pop_text_stream();
+
+        generator_->render_table_row(text_stream(), trim(cells));
+
+        children[1]->accept(*this);  // 1: row
     }
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_table_row";
@@ -403,8 +417,35 @@ void cst_to_ast_visitor::visit(cst_table_cell *node) {
     DLOG_IF(INFO, LOG_VISIT) << "entering cst_table_cell size: "
                              << node->children().size();
 
-    for (const auto &child : node->children()) {
-        child->accept(*this);
+    const auto &children = node->children();
+    if (children.size() == 2) {
+        push_text_stream();
+        children[0]->accept(*this);  // 0: cell text
+        string cell_text = text_stream().str();
+        pop_text_stream();
+
+        switch (node->alignment()) {
+            case cst_table_cell::alignment_enum::STANDARD:
+                generator_->render_table_cell(text_stream(), trim(cell_text));
+                break;
+
+            case cst_table_cell::alignment_enum::LEFT:
+                generator_->render_table_cell_left_aligned(text_stream(),
+                                                           trim(cell_text));
+                break;
+
+            case cst_table_cell::alignment_enum::CENTER:
+                generator_->render_table_cell_center_aligned(text_stream(),
+                                                             trim(cell_text));
+                break;
+
+            case cst_table_cell::alignment_enum::RIGHT:
+                generator_->render_table_cell_right_aligned(text_stream(),
+                                                            trim(cell_text));
+                break;
+        }
+
+        children[1]->accept(*this);  // 1: cell
     }
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_table_cell";
@@ -414,8 +455,15 @@ void cst_to_ast_visitor::visit(cst_table_cell_text *node) {
     DLOG_IF(INFO, LOG_VISIT) << "entering cst_table_cell_text size: "
                              << node->children().size();
 
-    for (const auto &child : node->children()) {
-        child->accept(*this);
+    const auto &children = node->children();
+    if (children.size() == 2) {
+        push_text_stream();
+        children[0]->accept(*this);  // 0: (text/...)
+        children[1]->accept(*this);  // 1: cell text
+        string cell_text = text_stream().str();
+        pop_text_stream();
+
+        text_stream() << cell_text;
     }
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_table_cell_text";

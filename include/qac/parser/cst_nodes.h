@@ -296,7 +296,16 @@ class cst_table_cell : public cst_node {
    public:
     cst_table_cell() : cst_node(cst_node_enum::TABLE_CELL) {}
 
+    enum class alignment_enum { STANDARD, LEFT, CENTER, RIGHT };
+
     virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+
+    alignment_enum alignment() const { return alignment_; }
+
+    void alignment(alignment_enum alignment) { alignment_ = alignment; }
+
+   private:
+    alignment_enum alignment_ = alignment_enum::STANDARD;
 };
 
 class cst_table_cell_text : public cst_node {

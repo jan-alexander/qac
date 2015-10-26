@@ -122,7 +122,8 @@ void html_generator::render_document(std::ostream &os,
        << "                    padding: 10px;\n"
        << "                    font-weight: 400;\n"
        << "            }\n"
-       << "            h1 > span:first-child, h2 > span:first-child, h3 > span:first-child, h4 > span:first-child {\n"
+       << "            h1 > span:first-child, h2 > span:first-child, h3 > "
+          "span:first-child, h4 > span:first-child {\n"
        << "                    color: lightgrey;\n"
        << "                    font-weight: 300;\n"
        << "                    padding-right: .5em;\n"
@@ -150,10 +151,57 @@ void html_generator::render_document(std::ostream &os,
        << "                box-shadow: 0 0 1em #EEE;\n"
        << "            }\n"
        << "            .qa_ul {\n"
-       << "                    text-decoration: underline;\n"
+       << "                text-decoration: underline;\n"
+       << "            }\n"
+       << "            table {\n"
+       << "                border-collapse: collapse;\n"
+       << "            }\n"
+       << "            table, th, td {\n"
+       << "                border: 1px solid black;\n"
+       << "            }\n"
+       << "            td {\n"
+       << "                padding: 1em;\n"
+       << "            }\n"
+       << "            td.qa_la {\n"
+       << "                text-align: left;\n"
+       << "            }\n"
+       << "            td.qa_ca {\n"
+       << "                text-align: center;\n"
+       << "            }\n"
+       << "            td.qa_ra {\n"
+       << "                text-align: right;\n"
        << "            }\n"
        << "        </style>\n"
        << "    </head>\n"
        << "    <body>\n" << body << "    </body>"
        << "</html>";
+}
+
+void html_generator::render_table_cell(std::ostream &os,
+                                       const std::string &cell_body) {
+    os << "<td>" << cell_body << "</td>";
+}
+
+void html_generator::render_table_cell_left_aligned(
+    std::ostream &os, const std::string &cell_body) {
+    os << "<td class=\"qa_la\">" << cell_body << "</td>";
+}
+
+void html_generator::render_table_cell_right_aligned(
+    std::ostream &os, const std::string &cell_body) {
+    os << "<td class=\"qa_ra\">" << cell_body << "</td>";
+}
+
+void html_generator::render_table_cell_center_aligned(
+    std::ostream &os, const std::string &cell_body) {
+    os << "<td class=\"qa_ca\">" << cell_body << "</td>";
+}
+
+void html_generator::render_table_row(std::ostream &os,
+                                      const std::string &cells) {
+    os << "<tr>" << cells << "</tr>";
+}
+
+void html_generator::render_table(std::ostream &os, const std::string &rows) {
+    os << "<table>" << rows << "</table>";
 }

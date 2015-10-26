@@ -636,7 +636,6 @@ std::unique_ptr<cst_node> parser::parse_table() {
 
     match(token_enum::TABLE_DIVIDER);
     ret->add_child(parse_table_row());
-    // ret->add_child(parse_table_row(true));
 
     return ret;
 }
@@ -651,9 +650,7 @@ std::unique_ptr<cst_node> parser::parse_table_row(bool optional) {
         case token_enum::TABLE_CELL_RIGHT_ALIGNED:
         case token_enum::TABLE_CELL_CENTER_ALIGNED:
             ret->add_child(parse_table_cell());
-            // ret->add_child(parse_table_cell(true));
             match(token_enum::TABLE_DIVIDER);
-
             ret->add_child(parse_table_row(true));
             break;
 
@@ -672,29 +669,40 @@ std::unique_ptr<cst_node> parser::parse_table_cell(bool optional) {
     DLOG(INFO) << "parse_table_cell optional? " << optional;
     unique_ptr<cst_node> ret = make_unique<cst_table_cell>();
 
+    auto parse_text_and_cell = [&]() {
+        if (lookahead_->get_token() != token_enum::NEW_LINE) {
+            ret->add_child(parse_table_cell_text());
+            ret->add_child(parse_table_cell(true));
+        } else {
+            skip_whitespace();
+        }
+    };
+
     switch (lookahead()) {
         case token_enum::TABLE_CELL:
             match(token_enum::TABLE_CELL);
-            ret->add_child(parse_table_cell_text());
-            ret->add_child(parse_table_cell(true));
+            parse_text_and_cell();
             break;
 
         case token_enum::TABLE_CELL_LEFT_ALIGNED:
             match(token_enum::TABLE_CELL_LEFT_ALIGNED);
-            ret->add_child(parse_table_cell_text());
-            ret->add_child(parse_table_cell(true));
+            dynamic_cast<cst_table_cell *>(ret.get())
+                ->alignment(cst_table_cell::alignment_enum::LEFT);
+            parse_text_and_cell();
             break;
 
         case token_enum::TABLE_CELL_RIGHT_ALIGNED:
             match(token_enum::TABLE_CELL_RIGHT_ALIGNED);
-            ret->add_child(parse_table_cell_text());
-            ret->add_child(parse_table_cell(true));
+            dynamic_cast<cst_table_cell *>(ret.get())
+                ->alignment(cst_table_cell::alignment_enum::RIGHT);
+            parse_text_and_cell();
             break;
 
         case token_enum::TABLE_CELL_CENTER_ALIGNED:
             match(token_enum::TABLE_CELL_CENTER_ALIGNED);
-            ret->add_child(parse_table_cell_text());
-            ret->add_child(parse_table_cell(true));
+            dynamic_cast<cst_table_cell *>(ret.get())
+                ->alignment(cst_table_cell::alignment_enum::CENTER);
+            parse_text_and_cell();
             break;
 
         default:

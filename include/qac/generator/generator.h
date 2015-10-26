@@ -58,6 +58,18 @@ class generator {
 
     virtual void render_document(std::ostream &os, const std::string &body) = 0;
 
+    virtual void render_table_cell(std::ostream &os,
+                                   const std::string &cell_body) = 0;
+    virtual void render_table_cell_left_aligned(
+        std::ostream &os, const std::string &cell_body) = 0;
+    virtual void render_table_cell_right_aligned(
+        std::ostream &os, const std::string &cell_body) = 0;
+    virtual void render_table_cell_center_aligned(
+        std::ostream &os, const std::string &cell_body) = 0;
+    virtual void render_table_row(std::ostream &os,
+                                  const std::string &cells) = 0;
+    virtual void render_table(std::ostream &os, const std::string &rows) = 0;
+
    private:
     int chapter_counter_ = 0;
     int section_counter_ = 0;

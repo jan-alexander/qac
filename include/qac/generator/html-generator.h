@@ -45,6 +45,19 @@ class html_generator : public generator {
 
     virtual void render_document(std::ostream &os,
                                  const std::string &body) override;
+
+    virtual void render_table_cell(std::ostream &os,
+                                   const std::string &cell_body) override;
+    virtual void render_table_cell_left_aligned(
+        std::ostream &os, const std::string &cell_body) override;
+    virtual void render_table_cell_right_aligned(
+        std::ostream &os, const std::string &cell_body) override;
+    virtual void render_table_cell_center_aligned(
+        std::ostream &os, const std::string &cell_body) override;
+    virtual void render_table_row(std::ostream &os,
+                                  const std::string &cells) override;
+    virtual void render_table(std::ostream &os,
+                              const std::string &rows) override;
 };
 }
 
