@@ -6,6 +6,13 @@
 
 #include <string>
 
+#include <gflags/gflags.h>
+
+DECLARE_string(chapter);
+DECLARE_string(section);
+DECLARE_string(subsection);
+DECLARE_string(question);
+
 namespace qac {
 
 class generator {

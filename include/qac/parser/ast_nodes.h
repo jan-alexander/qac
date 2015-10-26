@@ -112,6 +112,8 @@ class ast_subsection : public ast_node, public has_questions {
 
     virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
 
+    uint16_t nth_subsection() const { return nth_subsection_; }
+
    private:
     std::string subsection_;
 
@@ -140,6 +142,8 @@ class ast_section : public ast_node, public has_questions {
     const subsection_vector &subsections() const { return subsections_; }
 
     virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
+
+    uint16_t nth_section() const { return nth_section_; }
 
    private:
     std::string section_;

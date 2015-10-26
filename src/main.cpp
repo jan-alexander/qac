@@ -18,6 +18,12 @@ DEFINE_bool(printtokens, false, "Print lexing tokens.");
 DEFINE_string(generator, "html", "Used generator.");
 DEFINE_string(output, "", "File to write output to.");
 
+DEFINE_string(chapter, "Chapter", "The word chapter used for rendering.");
+DEFINE_string(section, "Section", "The word section used for rendering.");
+DEFINE_string(subsection, "Subsection",
+              "The subsection chapter used for rendering.");
+DEFINE_string(question, "Question", "The word question used for rendering.");
+
 void print_tokens(const vector<token> &tokens) {
     for (token token : tokens) {
         cout << token << endl;
