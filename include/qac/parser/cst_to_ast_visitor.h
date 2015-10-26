@@ -52,6 +52,7 @@ class cst_to_ast_visitor : public cst_visitor {
     virtual void visit(cst_table *node) override;
     virtual void visit(cst_table_row *node) override;
     virtual void visit(cst_table_cell *node) override;
+    virtual void visit(cst_table_cell_text *node) override;
 
    private:
     void push_text_stream() { texts_stack_.push(std::ostringstream()); }

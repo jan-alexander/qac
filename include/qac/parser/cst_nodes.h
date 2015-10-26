@@ -34,6 +34,7 @@ enum class cst_node_enum {
     TABLE,
     TABLE_ROW,
     TABLE_CELL,
+    TABLE_CELL_TEXT,
 };
 
 std::string to_string(const cst_node_enum &nenum);
@@ -63,6 +64,7 @@ class cst_subsection;
 class cst_table;
 class cst_table_row;
 class cst_table_cell;
+class cst_table_cell_text;
 
 class cst_visitor {
    public:
@@ -90,6 +92,7 @@ class cst_visitor {
     virtual void visit(cst_table *node) = 0;
     virtual void visit(cst_table_row *node) = 0;
     virtual void visit(cst_table_cell *node) = 0;
+    virtual void visit(cst_table_cell_text *node) = 0;
 };
 
 class has_words {
@@ -292,6 +295,13 @@ class cst_table_row : public cst_node {
 class cst_table_cell : public cst_node {
    public:
     cst_table_cell() : cst_node(cst_node_enum::TABLE_CELL) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_table_cell_text : public cst_node {
+   public:
+    cst_table_cell_text() : cst_node(cst_node_enum::TABLE_CELL_TEXT) {}
 
     virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
 };

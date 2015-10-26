@@ -41,6 +41,7 @@ class parser {
     std::unique_ptr<cst_node> parse_table();
     std::unique_ptr<cst_node> parse_table_row(bool optional = false);
     std::unique_ptr<cst_node> parse_table_cell(bool optional = false);
+    std::unique_ptr<cst_node> parse_table_cell_text();
 
     std::vector<token>::const_iterator current_;
     std::vector<token>::const_iterator lookahead_;

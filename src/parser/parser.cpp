@@ -136,12 +136,24 @@
  * OPT_TABLE_ROW                   ::= TABLE_ROW OPT_TABLE_ROW
  *                                   | EMPTY_WORD
  *
- * TABLE_CELL                      ::= TOKEN_TABLE_CELL
+ * TABLE_CELL                      ::= TOKEN_TABLE_CELL OPT_TABLE_CELL_TEXT
  *                                   | TOKEN_TABLE_CELL_LEFT_ALIGNED
+ *                                         OPT_TABLE_CELL_TEXT
  *                                   | TOKEN_TABLE_CELL_RIGHT_ALIGNED
+ *                                         OPT_TABLE_CELL_TEXT
  *                                   | TOKEN_TABLE_CELL_CENTER_ALIGNED
+ *                                         OPT_TABLE_CELL_TEXT
  *
  * OPT_TABLE_CELL                  ::= TABLE_CELL OPT_TABLE_CELL
+ *                                   | EMPTY_WORD
+ *
+ * OPT_TABLE_CELL_TEXT             ::= TEXT VALID_ANSWER_TEXT
+ *                                   | LATEX VALID_ANSWER_TEXT
+ *                                   | UNORDERED_LIST VALID_ANSWER_TEXT
+ *                                   | ORDERED_LIST VALID_ANSWER_TEXT
+ *                                   | BOLD VALID_ANSWER_TEXT
+ *                                   | UNDERLINED VALID_ANSWER_TEXT
+ *                                   | CODE VALID_ANSWER_TEXT
  *                                   | EMPTY_WORD
  *
  */
@@ -624,7 +636,7 @@ std::unique_ptr<cst_node> parser::parse_table() {
 
     match(token_enum::TABLE_DIVIDER);
     ret->add_child(parse_table_row());
-    ret->add_child(parse_table_row(true));
+    // ret->add_child(parse_table_row(true));
 
     return ret;
 }
@@ -639,8 +651,10 @@ std::unique_ptr<cst_node> parser::parse_table_row(bool optional) {
         case token_enum::TABLE_CELL_RIGHT_ALIGNED:
         case token_enum::TABLE_CELL_CENTER_ALIGNED:
             ret->add_child(parse_table_cell());
-            ret->add_child(parse_table_cell(true));
+            // ret->add_child(parse_table_cell(true));
             match(token_enum::TABLE_DIVIDER);
+
+            ret->add_child(parse_table_row(true));
             break;
 
         default:
@@ -661,18 +675,26 @@ std::unique_ptr<cst_node> parser::parse_table_cell(bool optional) {
     switch (lookahead()) {
         case token_enum::TABLE_CELL:
             match(token_enum::TABLE_CELL);
+            ret->add_child(parse_table_cell_text());
+            ret->add_child(parse_table_cell(true));
             break;
 
         case token_enum::TABLE_CELL_LEFT_ALIGNED:
             match(token_enum::TABLE_CELL_LEFT_ALIGNED);
+            ret->add_child(parse_table_cell_text());
+            ret->add_child(parse_table_cell(true));
             break;
 
         case token_enum::TABLE_CELL_RIGHT_ALIGNED:
             match(token_enum::TABLE_CELL_RIGHT_ALIGNED);
+            ret->add_child(parse_table_cell_text());
+            ret->add_child(parse_table_cell(true));
             break;
 
         case token_enum::TABLE_CELL_CENTER_ALIGNED:
             match(token_enum::TABLE_CELL_CENTER_ALIGNED);
+            ret->add_child(parse_table_cell_text());
+            ret->add_child(parse_table_cell(true));
             break;
 
         default:
@@ -680,6 +702,54 @@ std::unique_ptr<cst_node> parser::parse_table_cell(bool optional) {
                 no_rule_found(cst_node_enum::TABLE_CELL);
                 return nullptr;
             }
+            break;
+    }
+
+    return ret;
+}
+
+std::unique_ptr<cst_node> parser::parse_table_cell_text() {
+    DLOG(INFO) << "parse_table_cell_text";
+    unique_ptr<cst_node> ret = make_unique<cst_table_cell_text>();
+
+    switch (lookahead()) {
+        case token_enum::WORD:
+            ret->add_child(parse_text());
+            ret->add_child(parse_table_cell_text());
+            break;
+
+        case token_enum::LATEX_OPENING:
+        case token_enum::LATEX_CENTERED_OPENING:
+            ret->add_child(parse_latex());
+            ret->add_child(parse_table_cell_text());
+            break;
+
+        case token_enum::UNORDERED_LIST_ITEM:
+            ret->add_child(parse_unordered_list());
+            ret->add_child(parse_table_cell_text());
+            break;
+
+        case token_enum::ORDERED_LIST_ITEM:
+            ret->add_child(parse_ordered_list());
+            ret->add_child(parse_table_cell_text());
+            break;
+
+        case token_enum::BOLD_OPENING:
+            ret->add_child(parse_bold());
+            ret->add_child(parse_table_cell_text());
+            break;
+
+        case token_enum::UNDERLINE_OPENING:
+            ret->add_child(parse_underlined());
+            ret->add_child(parse_table_cell_text());
+            break;
+
+        case token_enum::CODE_OPENING:
+            ret->add_child(parse_code());
+            ret->add_child(parse_table_cell_text());
+            break;
+
+        default:  // table cells can be empty
             break;
     }
 
@@ -734,6 +804,8 @@ std::string qac::to_string(const cst_node_enum &nenum) {
             return "TABLE_ROW";
         case cst_node_enum::TABLE_CELL:
             return "TABLE_CELL";
+        case cst_node_enum::TABLE_CELL_TEXT:
+            return "TABLE_CELL_TEXT";
         default:
             return ">>UNKNOWN_NODE<<";
     }

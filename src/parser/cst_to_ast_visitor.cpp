@@ -409,3 +409,14 @@ void cst_to_ast_visitor::visit(cst_table_cell *node) {
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_table_cell";
 }
+
+void cst_to_ast_visitor::visit(cst_table_cell_text *node) {
+    DLOG_IF(INFO, LOG_VISIT) << "entering cst_table_cell_text size: "
+                             << node->children().size();
+
+    for (const auto &child : node->children()) {
+        child->accept(*this);
+    }
+
+    DLOG_IF(INFO, LOG_VISIT) << "exiting cst_table_cell_text";
+}
