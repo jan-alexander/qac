@@ -1,6 +1,7 @@
 #ifndef QAC_LEXER_H
 #define QAC_LEXER_H
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -85,10 +86,31 @@ class lexer {
    public:
     lexer();
     std::vector<token> lex(std::istream& input);
+    
+    static bool include_file(std::string filename) {
+        auto ret = included_files_.insert(filename);
+        return ret.second;
+    }
 
    private:
+    const std::string TOKEN_COMMENT = "#";
+    const std::string TOKEN_CHAPTER = "CHA:";
+    const std::string TOKEN_SECTION = "SEC:";
+    const std::string TOKEN_SUBSECTION = "SUB:";
+    const std::string TOKEN_QUESTION = "Q:";
+    const std::string TOKEN_ANSWER = "A:";
+    const std::string TOKEN_FILE = "FILE:";
+    const std::string TOKEN_UNORDERED_LIST_ITEM = "-";
+    const std::string TOKEN_ORDERED_LIST_ITEM = "#.";
+    const std::string TOKEN_TABLE_CELL = "|";
+    const std::string TOKEN_TABLE_CELL_LEFT_ALIGNED = "|<";
+    const std::string TOKEN_TABLE_CELL_RIGHT_ALIGNED = "|>";
+    const std::string TOKEN_TABLE_CELL_CENTER_ALIGNED = "|-";
+
     void lex_line(std::vector<token>& tokens, const std::string& line,
                   int line_nr);
+
+    void lex_file(const std::string &line, uint16_t line_nr);
 
     bool next_char_equals(const std::string& line, const size_t& cur_pos,
                           const char& letter) const;
@@ -99,6 +121,9 @@ class lexer {
     bool in_latex_ = false;
     lexer_state* cur_lexer_state_ = nullptr;
     std::vector<std::unique_ptr<qac::lexer_state>> possible_states_;
+    std::vector<token> tokens_;
+    
+    static std::set<std::string> included_files_;
 };
 }
 

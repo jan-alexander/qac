@@ -9,6 +9,8 @@
 using namespace qac;
 using namespace std;
 
+std::set<std::string> lexer::included_files_;
+
 bool lexer_state::matches_opening_token(string &word) {
     string opening_token = get_opening_string_token();
     if (word.length() >= opening_token.length() &&
@@ -124,7 +126,7 @@ token_enum token::get_token() const { return token_; }
 
 string token::get_value() const { return value_; }
 
-std::ostream& qac::operator<<(std::ostream& os, const token& token) {
+std::ostream &qac::operator<<(std::ostream &os, const token &token) {
     os << token.token_ << "@" << token.line_ << "[" << token.value_ << "]";
     return os;
 }
@@ -139,18 +141,21 @@ lexer::lexer() {
 
 vector<token> lexer::lex(std::istream &input) {
     uint16_t line_nr = 0;
-    vector<token> tokens;
     string line;
 
     while (getline(input, line)) {
-        lex_line(tokens, line, ++line_nr);
+        lex_line(tokens_, line, ++line_nr);
     }
 
-    return tokens;
+    return tokens_;
 }
 
 void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
     string trimmed_line = boost::trim_copy(line);
+
+    if (boost::starts_with(trimmed_line, TOKEN_COMMENT)) {
+        return;
+    }
 
     if (trimmed_line.empty()) {
         tokens.push_back(token(token_enum::EMPTY_LINE, "", line_nr));
@@ -209,42 +214,49 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
             }
 
             if (first_word) {
-                if (word.compare("Q:") == 0) {
-                    tokens.push_back(token(token_enum::QUESTION, word, line_nr));
+                if (word == TOKEN_QUESTION) {
+                    tokens.push_back(
+                        token(token_enum::QUESTION, word, line_nr));
                     was_q_or_a = true;
-                } else if (word.compare("A:") == 0) {
+                } else if (word == TOKEN_ANSWER) {
                     tokens.push_back(token(token_enum::ANSWER, word, line_nr));
                     was_q_or_a = true;
-                } else if (word.compare("CHA:") == 0) {
+                } else if (word == TOKEN_CHAPTER) {
                     tokens.push_back(token(token_enum::CHAPTER, word, line_nr));
-                } else if (word.compare("SEC:") == 0) {
+                } else if (word == TOKEN_SECTION) {
                     tokens.push_back(token(token_enum::SECTION, word, line_nr));
-                } else if (word.compare("SUB:") == 0) {
-                    tokens.push_back(token(token_enum::SUBSECTION, word, line_nr));
-                } else if (word.compare("-") == 0) {
+                } else if (word == TOKEN_SUBSECTION) {
+                    tokens.push_back(
+                        token(token_enum::SUBSECTION, word, line_nr));
+                } else if (word == TOKEN_FILE) {
+                    lex_file(line, line_nr);
+                    return;
+                } else if (word == TOKEN_UNORDERED_LIST_ITEM) {
                     tokens.push_back(
                         token(token_enum::UNORDERED_LIST_ITEM, word, line_nr));
-                } else if (word.compare("#.") == 0) {
+                } else if (word == TOKEN_ORDERED_LIST_ITEM) {
                     tokens.push_back(
                         token(token_enum::ORDERED_LIST_ITEM, word, line_nr));
-                } else if (word.compare("|") == 0) {
-                    has_table = true;
-                    tokens.push_back(token(token_enum::TABLE_CELL, word, line_nr));
-                } else if (word.compare("|<") == 0) {
+                } else if (word == TOKEN_TABLE_CELL) {
                     has_table = true;
                     tokens.push_back(
-                        token(token_enum::TABLE_CELL_LEFT_ALIGNED, word, line_nr));
-                } else if (word.compare("|>") == 0) {
+                        token(token_enum::TABLE_CELL, word, line_nr));
+                } else if (word == TOKEN_TABLE_CELL_LEFT_ALIGNED) {
                     has_table = true;
-                    tokens.push_back(
-                        token(token_enum::TABLE_CELL_RIGHT_ALIGNED, word, line_nr));
-                } else if (word.compare("|-") == 0) {
+                    tokens.push_back(token(token_enum::TABLE_CELL_LEFT_ALIGNED,
+                                           word, line_nr));
+                } else if (word == TOKEN_TABLE_CELL_RIGHT_ALIGNED) {
                     has_table = true;
-                    tokens.push_back(
-                        token(token_enum::TABLE_CELL_CENTER_ALIGNED, word, line_nr));
+                    tokens.push_back(token(token_enum::TABLE_CELL_RIGHT_ALIGNED,
+                                           word, line_nr));
+                } else if (word == TOKEN_TABLE_CELL_CENTER_ALIGNED) {
+                    has_table = true;
+                    tokens.push_back(token(
+                        token_enum::TABLE_CELL_CENTER_ALIGNED, word, line_nr));
                 } else if (word.size() >= 3 &&
                            boost::starts_with(word, "---")) {
-                    tokens.push_back(token(token_enum::TABLE_DIVIDER, word, line_nr));
+                    tokens.push_back(
+                        token(token_enum::TABLE_DIVIDER, word, line_nr));
                 } else if (boost::ends_with(word, ".") &&
                            all_of(word.begin(), word.end() - 1, ::isdigit)) {
                     tokens.push_back(
@@ -254,23 +266,28 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
                 }
             } else {
                 if (has_table) {
-                    if (word.compare("|") == 0) {
-                        has_table = true;
-                        tokens.push_back(token(token_enum::TABLE_CELL, word, line_nr));
-                    } else if (word.compare("|<") == 0) {
+                    if (word == TOKEN_TABLE_CELL) {
                         has_table = true;
                         tokens.push_back(
-                            token(token_enum::TABLE_CELL_LEFT_ALIGNED, word, line_nr));
-                    } else if (word.compare("|>") == 0) {
+                            token(token_enum::TABLE_CELL, word, line_nr));
+                    } else if (word == TOKEN_TABLE_CELL_LEFT_ALIGNED) {
                         has_table = true;
                         tokens.push_back(
-                            token(token_enum::TABLE_CELL_RIGHT_ALIGNED, word, line_nr));
-                    } else if (word.compare("|-") == 0) {
+                            token(token_enum::TABLE_CELL_LEFT_ALIGNED, word,
+                                  line_nr));
+                    } else if (word == TOKEN_TABLE_CELL_RIGHT_ALIGNED) {
                         has_table = true;
                         tokens.push_back(
-                            token(token_enum::TABLE_CELL_CENTER_ALIGNED, word, line_nr));
+                            token(token_enum::TABLE_CELL_RIGHT_ALIGNED, word,
+                                  line_nr));
+                    } else if (word == TOKEN_TABLE_CELL_CENTER_ALIGNED) {
+                        has_table = true;
+                        tokens.push_back(
+                            token(token_enum::TABLE_CELL_CENTER_ALIGNED, word,
+                                  line_nr));
                     } else {
-                        tokens.push_back(token(token_enum::WORD, word, line_nr));
+                        tokens.push_back(
+                            token(token_enum::WORD, word, line_nr));
                     }
                 } else {
                     tokens.push_back(token(token_enum::WORD, word, line_nr));
@@ -286,6 +303,22 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
     }
 
     tokens.push_back(token(token_enum::NEW_LINE, "", line_nr));
+}
+
+void lexer::lex_file(const std::string &line, uint16_t line_nr) {
+    string filename = line.substr(TOKEN_FILE.length() + 1);
+    if (!include_file(filename)) {
+        return;
+    }
+
+    std::ifstream input(filename);
+    if (!input.is_open()) {
+        throw runtime_error("Couldn't open '" + filename + "'");
+    }
+
+    lexer lexer;
+    vector<token> tokens = lexer.lex(input);
+    copy(tokens.begin(), tokens.end(), back_inserter(tokens_));
 }
 
 bool lexer::next_char_equals(const string &line, const size_t &cur_pos,

@@ -23,6 +23,7 @@ DEFINE_string(section, "Section", "The word section used for rendering.");
 DEFINE_string(subsection, "Subsection",
               "The subsection chapter used for rendering.");
 DEFINE_string(question, "Question", "The word question used for rendering.");
+DEFINE_bool(render, true, "Render the contenten or not.");
 
 void print_tokens(const vector<token> &tokens) {
     for (token token : tokens) {
@@ -86,6 +87,7 @@ int main(int argc, char *argv[]) {
     const char *input_file = argv[1];
 
     try {
+        lexer::include_file(input_file);
         std::ifstream input(input_file);
         if (!input.is_open()) {
             throw runtime_error("Couldn't open '" + string(input_file) + "'");
@@ -93,7 +95,7 @@ int main(int argc, char *argv[]) {
 
         bool use_stdout = FLAGS_output.empty();
         std::ofstream output;
-        if (!use_stdout) {
+        if (!use_stdout && FLAGS_render) {
             output.open(FLAGS_output);
             if (!output.is_open()) {
                 throw runtime_error("Couldn't open '" + FLAGS_output + "'");
@@ -113,8 +115,10 @@ int main(int argc, char *argv[]) {
             print_cst(root.get());
         }
 
-        generator_map.at(FLAGS_generator)
-            ->generate(root.get(), use_stdout ? cout : output);
+        if (FLAGS_render) {
+            generator_map.at(FLAGS_generator)
+                ->generate(root.get(), use_stdout ? cout : output);
+        }
     } catch (exception &e) {
         cerr << "Error: " << e.what() << endl;
     }
