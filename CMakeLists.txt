@@ -18,6 +18,7 @@ set(HEADER_FILES
     include/qac/parser/ast_render_visitor.h
     include/qac/generator/generator.h
     include/qac/generator/html-generator.h
+    include/qac/generator/anki-generator.h
 )
 
 set(COMMON_SOURCE_FILES
@@ -25,8 +26,10 @@ set(COMMON_SOURCE_FILES
     src/parser/parser.cpp
     src/parser/cst_to_ast_visitor.cpp
     src/parser/ast_render_visitor.cpp
+    src/parser/ast_nodes.cpp
     src/generator/generator.cpp
     src/generator/html-generator.cpp
+    src/generator/anki-generator.cpp
 )
 
 set(QAC_SOURCE_FILES

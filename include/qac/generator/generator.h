@@ -35,8 +35,8 @@ class generator {
     virtual void render_ordered_list_item(std::ostream &os,
                                           const std::string &text) = 0;
 
-    void render_normal_latex(std::ostream &os, const std::string &text);
-    void render_centered_latex(std::ostream &os, const std::string &text);
+    virtual void render_normal_latex(std::ostream &os, const std::string &text);
+    virtual void render_centered_latex(std::ostream &os, const std::string &text);
 
     virtual void render_chapter(std::ostream &os, const std::string &caption,
                                 const std::string &questions,

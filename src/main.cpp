@@ -5,9 +5,10 @@
 #include <map>
 #include <set>
 
-#include "qac/generator/html-generator.h"
-#include "qac/lexer/lexer.h"
-#include "qac/parser/parser.h"
+#include <qac/generator/html-generator.h>
+#include <qac/generator/anki-generator.h>
+#include <qac/lexer/lexer.h>
+#include <qac/parser/parser.h>
 
 using namespace qac;
 using namespace std;
@@ -70,10 +71,11 @@ int main(int argc, char *argv[]) {
 
     map<string, unique_ptr<qac::generator>> generator_map;
     add_generator(generator_map, make_unique<html_generator>());
+    add_generator(generator_map, make_unique<anki_generator>());
 
     if (FLAGS_listgenerators) {
         for (const auto &it : generator_map) {
-            cout << it.second->get_name() << "\t\t"
+            cout << it.second->get_name() << "\t"
                  << it.second->get_description() << endl;
         }
         return 1;

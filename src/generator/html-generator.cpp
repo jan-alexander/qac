@@ -1,6 +1,6 @@
 #include "qac/generator/html-generator.h"
 
-#include <istream>
+#include <iostream>
 
 using namespace qac;
 using namespace std;

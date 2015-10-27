@@ -1,30 +1,19 @@
-#ifndef QAC_HTML_GENERATOR_H
-#define QAC_HTML_GENERATOR_H
+#ifndef QAC_ANKI_GENERATOR_H
+#define QAC_ANKI_GENERATOR_H
 
-#include "qac/generator/generator.h"
+#include <qac/generator/html-generator.h>
 
 namespace qac {
 
-class html_generator : public generator {
+class anki_generator : public html_generator {
    public:
     virtual std::string get_name() override;
     virtual std::string get_description() override;
 
    protected:
-    virtual void render_bold(std::ostream &os,
-                             const std::string &text) override;
     virtual void render_underlined(std::ostream &os,
                                    const std::string &text) override;
-    virtual void render_code(std::ostream &os,
-                             const std::string &text) override;
-    virtual void render_unordered_list(std::ostream &os,
-                                       const std::string &text) override;
-    virtual void render_unordered_list_item(std::ostream &os,
-                                            const std::string &text) override;
-    virtual void render_ordered_list(std::ostream &os,
-                                     const std::string &text) override;
-    virtual void render_ordered_list_item(std::ostream &os,
-                                          const std::string &text) override;
+
     virtual void render_chapter(std::ostream &os, const std::string &caption,
                                 const std::string &questions,
                                 const std::string &sections,
@@ -54,11 +43,12 @@ class html_generator : public generator {
         std::ostream &os, const std::string &cell_body) override;
     virtual void render_table_cell_center_aligned(
         std::ostream &os, const std::string &cell_body) override;
-    virtual void render_table_row(std::ostream &os,
-                                  const std::string &cells) override;
     virtual void render_table(std::ostream &os,
                               const std::string &rows) override;
-};
-}
 
-#endif  // QAC_HTML_GENERATOR_H
+    virtual void render_normal_latex(std::ostream &os, const std::string &text) override;
+    virtual void render_centered_latex(std::ostream &os, const std::string &text) override;
+};
+}  // namespace qac
+
+#endif

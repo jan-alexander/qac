@@ -72,6 +72,16 @@ class ast_question : public ast_node {
     void section(ast_section *section) { section_ = section; }
     void subsection(ast_subsection *subsection) { subsection_ = subsection; }
 
+    bool has_chapter() const { return chapter_ != nullptr; }
+    bool has_section() const { return section_ != nullptr; }
+    bool has_subsection() const { return subsection_ != nullptr; }
+    uint16_t nth_chapter() const;
+    uint16_t nth_section() const;
+    uint16_t nth_subsection() const;
+    const std::string &chapter() const;
+    const std::string &section() const;
+    const std::string &subsection() const;
+
     virtual void accept(ast_visitor &visitor) override { visitor.visit(this); }
 
    private:
