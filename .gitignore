@@ -3,3 +3,4 @@
 *.pyc
 .syntastic_clang_check_config
 compile_commands.json
+build/
