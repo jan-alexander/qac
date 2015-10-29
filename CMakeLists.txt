@@ -22,6 +22,7 @@ set(HEADER_FILES
 )
 
 set(COMMON_SOURCE_FILES
+    src/flags.cpp
     src/lexer/lexer.cpp
     src/parser/parser.cpp
     src/parser/cst_to_ast_visitor.cpp
@@ -52,3 +53,5 @@ target_link_libraries(qac ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})
 
 add_executable(qac_test ${TEST_SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(qac_test ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})
+
+install(TARGETS qac DESTINATION bin)

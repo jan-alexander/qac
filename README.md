@@ -14,6 +14,7 @@ A: 42
 ```
 
 That's basically it. Run `qac --output=topic.html topic.qa`, and you will have your question converted to a HTML page.
+If you want to comment a line out, simply put a `#` in front of it.
 
 ### Supported Formattings
 
@@ -137,7 +138,7 @@ that your compiler has to be C++14 compatible (due to `std::make_unique`).
   3. `cd ~/qac`
   4. `mkdir build && cd build`
   5. `cmake ..`
-  6. `make qac`
+  6. `make && make install`
 
 ## Extending qac
 

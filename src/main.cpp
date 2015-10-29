@@ -13,18 +13,17 @@
 using namespace qac;
 using namespace std;
 
-DEFINE_bool(listgenerators, false, "List available generators.");
-DEFINE_bool(printcst, false, "Print parse tree.");
-DEFINE_bool(printtokens, false, "Print lexing tokens.");
-DEFINE_string(generator, "html", "Used generator.");
-DEFINE_string(output, "", "File to write output to.");
+DECLARE_bool(listgenerators);
+DECLARE_bool(printcst);
+DECLARE_bool(printtokens);
+DECLARE_string(generator);
+DECLARE_string(output);
 
-DEFINE_string(chapter, "Chapter", "The word chapter used for rendering.");
-DEFINE_string(section, "Section", "The word section used for rendering.");
-DEFINE_string(subsection, "Subsection",
-              "The subsection chapter used for rendering.");
-DEFINE_string(question, "Question", "The word question used for rendering.");
-DEFINE_bool(render, true, "Render the contenten or not.");
+DECLARE_string(chapter);
+DECLARE_string(section);
+DECLARE_string(subsection);
+DECLARE_string(question);
+DECLARE_bool(render);
 
 void print_tokens(const vector<token> &tokens) {
     for (token token : tokens) {
@@ -83,7 +82,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (argc < 2) {
-        gflags::ShowUsageWithFlagsRestrict(argv[0], "main.cpp");
+        gflags::ShowUsageWithFlagsRestrict(argv[0], "flags.cpp");
         return 1;
     }
 
