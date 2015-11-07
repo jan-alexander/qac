@@ -16,6 +16,12 @@ A: 42
 That's basically it. Run `qac --output=topic.html topic.qa`, and you will have your question converted to a HTML page.
 If you want to comment a line out, simply put a `#` in front of it.
 
+To create text files, that can be imported by Anki, run:
+  
+  `qac --output=topic.txt --generator=anki topic.qa`
+
+Make sure to check the `Allow HTML` checkbox.
+
 ### Supported Formattings
 
   - Bold: Surround a word with `*`, e.g. `*strong*`
@@ -133,6 +139,8 @@ If you have them installed, simply use [CMake](https://cmake.org/) to create mak
 that your compiler has to be C++14 compatible (due to `std::make_unique`).
 
 ### On OS X using Homebrew
+The steps should be similar on linux. Make sure you have a compiler installed.
+
   1. `brew install boost cmake gflags glog`
   2. `git clone https://github.com/jan-alexander/qac.git ~/qac`
   3. `cd ~/qac`
