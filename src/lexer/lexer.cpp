@@ -156,7 +156,8 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
     if (boost::starts_with(trimmed_line, TOKEN_COMMENT)) {
         // check if it's an list item, and not a comment
         string::size_type min_size = TOKEN_COMMENT.size() + 1;
-        if (!(trimmed_line.size() >= min_size && trimmed_line[min_size - 1] == '.')) {
+        if (!(trimmed_line.size() >= min_size &&
+              trimmed_line[min_size - 1] == '.')) {
             return;
         }
     }
@@ -265,6 +266,9 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
                            all_of(word.begin(), word.end() - 1, ::isdigit)) {
                     tokens.push_back(
                         token(token_enum::ORDERED_LIST_ITEM, word, line_nr));
+                } else if (boost::starts_with(word, "IMG(") &&
+                           boost::ends_with(word, ")")) {
+                    tokens.push_back(token(token_enum::IMAGE, word, line_nr));
                 } else {
                     tokens.push_back(token(token_enum::WORD, word, line_nr));
                 }
@@ -289,10 +293,17 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
                         tokens.push_back(
                             token(token_enum::TABLE_CELL_CENTER_ALIGNED, word,
                                   line_nr));
+                    } else if (boost::starts_with(word, "IMG(") &&
+                               boost::ends_with(word, ")")) {
+                        tokens.push_back(
+                            token(token_enum::IMAGE, word, line_nr));
                     } else {
                         tokens.push_back(
                             token(token_enum::WORD, word, line_nr));
                     }
+                } else if (boost::starts_with(word, "IMG(") &&
+                           boost::ends_with(word, ")")) {
+                    tokens.push_back(token(token_enum::IMAGE, word, line_nr));
                 } else {
                     tokens.push_back(token(token_enum::WORD, word, line_nr));
                 }
@@ -397,6 +408,8 @@ std::string qac::to_string(qac::token_enum tenum) {
             return "CODE_CLOSING";
         case token_enum::END_OF_FILE:
             return "END_OF_FILE";
+        case token_enum::IMAGE:
+            return "IMAGE";
         default:
             return ">>UNKNOWN_TOKEN<<";
     }

@@ -35,6 +35,7 @@ enum class token_enum {
     SUBSECTION,
     CODE_OPENING,
     CODE_CLOSING,
+    IMAGE,
 };
 
 std::string to_string(token_enum tenum);

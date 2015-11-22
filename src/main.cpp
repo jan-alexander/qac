@@ -64,7 +64,7 @@ void add_generator(map<string, unique_ptr<generator>> &generator_map,
 }
 
 int main(int argc, char *argv[]) {
-    gflags::SetVersionString("0.1.1 BETA");
+    gflags::SetVersionString("0.2.1 BETA");
     gflags::SetUsageMessage("[flags] <qa-file>");
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
