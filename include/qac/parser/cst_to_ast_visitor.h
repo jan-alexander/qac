@@ -34,6 +34,7 @@ class cst_to_ast_visitor : public cst_visitor {
     virtual void visit(cst_question_text *node) override;
     virtual void visit(cst_answer_text *node) override;
     virtual void visit(cst_text *node) override;
+    virtual void visit(cst_image *node) override;
     virtual void visit(cst_latex *node) override;
     virtual void visit(cst_normal_latex *node) override;
     virtual void visit(cst_centered_latex *node) override;

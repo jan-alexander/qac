@@ -35,6 +35,7 @@ enum class cst_node_enum {
     TABLE_ROW,
     TABLE_CELL,
     TABLE_CELL_TEXT,
+    IMAGE,
 };
 
 std::string to_string(const cst_node_enum &nenum);
@@ -46,6 +47,7 @@ class cst_question;
 class cst_question_text;
 class cst_answer_text;
 class cst_text;
+class cst_image;
 class cst_latex;
 class cst_normal_latex;
 class cst_centered_latex;
@@ -74,6 +76,7 @@ class cst_visitor {
     virtual void visit(cst_question_text *node) = 0;
     virtual void visit(cst_answer_text *node) = 0;
     virtual void visit(cst_text *node) = 0;
+    virtual void visit(cst_image *node) = 0;
     virtual void visit(cst_latex *node) = 0;
     virtual void visit(cst_normal_latex *node) = 0;
     virtual void visit(cst_centered_latex *node) = 0;
@@ -171,6 +174,31 @@ class cst_text : public cst_node, public has_words {
     cst_text() : cst_node(cst_node_enum::TEXT) {}
 
     virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+};
+
+class cst_image : public cst_node {
+private:
+    bool has_size_ = false;
+    int width_ = -1;
+    int height_ = -1;
+    std::string source_;
+
+public:
+    cst_image() : cst_node(cst_node_enum::IMAGE) {}
+
+    virtual void accept(cst_visitor &visitor) override { visitor.visit(this); }
+
+    void set_source(std::string source) {
+        source_ = source;
+    }
+
+    void set_source(std::string source, int width, int height) {
+        set_source(source);
+
+        has_size_ = true;
+        width_ = width;
+        height_ = height;
+    }
 };
 
 class cst_latex : public cst_node {

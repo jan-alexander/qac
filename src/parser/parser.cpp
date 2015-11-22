@@ -24,12 +24,14 @@
  *                                   | BOLD VALID_QUESTION_TEXT
  *                                   | UNDERLINED VALID_QUESTION_TEXT
  *                                   | CODE VALID_QUESTION_TEXT
+ *                                   | IMAGE VALID_QUESTION_TEXT
  *
  * VALID_QUESTION_TEXT             ::= TEXT VALID_QUESTION_TEXT
  *                                   | LATEX VALID_QUESTION_TEXT
  *                                   | BOLD VALID_QUESTION_TEXT
  *                                   | UNDERLINED VALID_QUESTION_TEXT
  *                                   | CODE VALID_QUESTION_TEXT
+ *                                   | IMAGE VALID_QUESTION_TEXT
  *                                   | EMPTY_WORD
  *
  * ANSWER_TEXT                     ::= TEXT VALID_ANSWER_TEXT
@@ -40,6 +42,7 @@
  *                                   | UNDERLINED VALID_ANSWER_TEXT
  *                                   | CODE VALID_ANSWER_TEXT
  *                                   | TABLE VALID_ANSWER_TEXT
+ *                                   | IMAGE VALID_ANSWER_TEXT
  *
  * VALID_ANSWER_TEXT               ::= TEXT VALID_ANSWER_TEXT
  *                                   | LATEX VALID_ANSWER_TEXT
@@ -49,12 +52,15 @@
  *                                   | UNDERLINED VALID_ANSWER_TEXT
  *                                   | CODE VALID_ANSWER_TEXT
  *                                   | TABLE VALID_ANSWER_TEXT
+ *                                   | IMAGE VALID_ANSWER_TEXT
  *                                   | EMPTY_WORD
  *
  * TEXT                            ::= TOKEN_WORD OPT_WORD
  *
  * OPT_WORD                        ::= TOKEN_WORD OPT_WORD
  *                                   | EMPTY_WORD
+ *
+ * IMAGE                           ::= TOKEN_IMAGE
  *
  * LATEX                           ::= NORMAL_LATEX
  *                                   | CENTERED_LATEX
@@ -92,6 +98,7 @@
  *                                   | UNDERLINED VALID_LIST_ITEM_TEXT
  *                                   | CODE VALID_LIST_ITEM_TEXT
  *                                   | TABLE VALID_LIST_ITEM_TEXT
+ *                                   | IMAGE VALID_LIST_ITEM_TEXT
  *
  * VALID_LIST_ITEM_TEXT            ::= TEXT VALID_LIST_ITEM_TEXT
  *                                   | LATEX VALID_LIST_ITEM_TEXT
@@ -99,6 +106,7 @@
  *                                   | UNDERLINED VALID_LIST_ITEM_TEXT
  *                                   | CODE VALID_LIST_ITEM_TEXT
  *                                   | TABLE VALID_LIST_ITEM_TEXT
+ *                                   | IMAGE VALID_LIST_ITEM_TEXT
  *                                   | EMPTY_WORD
  *
  * BOLD                            ::= TOKEN_BOLD_OPENING TEXT
@@ -154,6 +162,7 @@
  *                                   | BOLD VALID_ANSWER_TEXT
  *                                   | UNDERLINED VALID_ANSWER_TEXT
  *                                   | CODE VALID_ANSWER_TEXT
+ *                                   | IMAGE VALID_ANSWER_TEXT
  *                                   | EMPTY_WORD
  *
  */
@@ -270,6 +279,11 @@ std::unique_ptr<cst_node> parser::parse_question_text(bool optional) {
             ret->add_child(parse_question_text(true));
             break;
 
+        case token_enum::IMAGE:
+            ret->add_child(parse_image());
+            ret->add_child(parse_question_text(true));
+            break;
+
         case token_enum::LATEX_OPENING:
         case token_enum::LATEX_CENTERED_OPENING:
             ret->add_child(parse_latex());
@@ -309,6 +323,11 @@ std::unique_ptr<cst_node> parser::parse_answer_text(bool optional) {
     switch (lookahead()) {
         case token_enum::WORD:
             ret->add_child(parse_text());
+            ret->add_child(parse_answer_text(true));
+            break;
+
+        case token_enum::IMAGE:
+            ret->add_child(parse_image());
             ret->add_child(parse_answer_text(true));
             break;
 
@@ -507,6 +526,11 @@ std::unique_ptr<cst_node> parser::parse_list_item_text(bool optional) {
     switch (lookahead()) {
         case token_enum::WORD:
             ret->add_child(parse_text());
+            ret->add_child(parse_list_item_text(true));
+            break;
+
+        case token_enum::IMAGE:
+            ret->add_child(parse_image());
             ret->add_child(parse_list_item_text(true));
             break;
 
@@ -726,6 +750,11 @@ std::unique_ptr<cst_node> parser::parse_table_cell_text() {
             ret->add_child(parse_table_cell_text());
             break;
 
+        case token_enum::IMAGE:
+            ret->add_child(parse_image());
+            ret->add_child(parse_table_cell_text());
+            break;
+
         case token_enum::LATEX_OPENING:
         case token_enum::LATEX_CENTERED_OPENING:
             ret->add_child(parse_latex());
@@ -764,6 +793,24 @@ std::unique_ptr<cst_node> parser::parse_table_cell_text() {
     return ret;
 }
 
+std::unique_ptr<cst_node> parser::parse_image() {
+    match(token_enum::IMAGE);
+
+    unique_ptr<cst_node> ret = make_unique<cst_image>();
+
+    cst_image *pimage = dynamic_cast<cst_image *>(ret.get());
+
+    std::string image_keyword = current_->get_value();
+
+    // strip leading IMG(
+    // strip trailing )
+    // TODO: extract image source, width, height
+    std::string content = image_keyword.substr(4, image_keyword.size() - 1);
+    pimage->set_source(content);
+
+    return ret;
+}
+
 std::string qac::to_string(const cst_node_enum &nenum) {
     switch (nenum) {
         case cst_node_enum::ROOT:
@@ -776,6 +823,8 @@ std::string qac::to_string(const cst_node_enum &nenum) {
             return "ANSWER_TEXT";
         case cst_node_enum::TEXT:
             return "TEXT";
+        case cst_node_enum::IMAGE:
+            return "IMAGE";
         case cst_node_enum::LATEX:
             return "LATEX";
         case cst_node_enum::NORMAL_LATEX:

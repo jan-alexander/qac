@@ -111,6 +111,16 @@ void cst_to_ast_visitor::visit(cst_text *node) {
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_text";
 }
 
+void cst_to_ast_visitor::visit(cst_image *node) {
+    DLOG_IF(INFO, LOG_VISIT) << "entering cst_image size: "
+                             << node->children().size();
+
+    // TODO: implement
+//    texts_stack_.top() << node->words() << " ";
+
+    DLOG_IF(INFO, LOG_VISIT) << "exiting cst_image";
+}
+
 void cst_to_ast_visitor::visit(cst_latex *node) {
     DLOG_IF(INFO, LOG_VISIT) << "entering cst_latex size: "
                              << node->children().size();
