@@ -178,7 +178,6 @@ class cst_text : public cst_node, public has_words {
 
 class cst_image : public cst_node {
 private:
-    bool has_size_ = false;
     int width_ = -1;
     int height_ = -1;
     std::string source_;
@@ -193,11 +192,21 @@ public:
     }
 
     void set_source(std::string source, int width, int height) {
-        set_source(source);
-
-        has_size_ = true;
+        source_ = source;
         width_ = width;
         height_ = height;
+    }
+
+    std::string get_source() const {
+        return source_;
+    }
+
+    int get_width() const {
+        return width_;
+    }
+
+    int get_height() const {
+        return height_;
     }
 };
 

@@ -11,6 +11,8 @@ class html_generator : public generator {
     virtual std::string get_description() override;
 
    protected:
+    virtual void render_image(std::ostream &os, const std::string &source,
+                              int width, int height) override;
     virtual void render_bold(std::ostream &os,
                              const std::string &text) override;
     virtual void render_underlined(std::ostream &os,

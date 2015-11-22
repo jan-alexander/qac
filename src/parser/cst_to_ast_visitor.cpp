@@ -115,8 +115,9 @@ void cst_to_ast_visitor::visit(cst_image *node) {
     DLOG_IF(INFO, LOG_VISIT) << "entering cst_image size: "
                              << node->children().size();
 
-    // TODO: implement
-//    texts_stack_.top() << node->words() << " ";
+    generator_->render_image(text_stream(), node->get_source(),
+                             node->get_width(), node->get_height());
+    text_stream() << " ";
 
     DLOG_IF(INFO, LOG_VISIT) << "exiting cst_image";
 }

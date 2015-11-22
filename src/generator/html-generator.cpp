@@ -9,6 +9,15 @@ string html_generator::get_name() { return "html"; }
 
 string html_generator::get_description() { return "Simple HTML generator"; }
 
+void html_generator::render_image(std::ostream &os, const std::string &source,
+                          int width, int height) {
+    os << "<img src=\"" << source << "\"";
+    if (width >= 0 && height >= 0) {
+        os << " width=\"" << width << "\" height=\"" << height << "\"";
+    }
+    os << ">";
+}
+
 void html_generator::render_bold(std::ostream &os, const std::string &text) {
     os << "<strong>" << text << "</strong>";
 }

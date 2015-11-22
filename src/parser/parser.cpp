@@ -5,6 +5,7 @@
 #include <sstream>
 
 #include <glog/logging.h>
+#include <boost/algorithm/string.hpp>
 
 /*
  * The grammar
@@ -802,11 +803,18 @@ std::unique_ptr<cst_node> parser::parse_image() {
 
     std::string image_keyword = current_->get_value();
 
-    // strip leading IMG(
-    // strip trailing )
-    // TODO: extract image source, width, height
-    std::string content = image_keyword.substr(4, image_keyword.size() - 1);
-    pimage->set_source(content);
+    // strip leading IMG(, strip trailing ), divide into parts
+    std::vector<std::string> parts;
+    std::string content = image_keyword.substr(4, image_keyword.find(')') - 4);
+    boost::split(parts, content, boost::is_any_of(","));
+    if (parts.size() == 3) {
+        pimage->set_source(parts[0], std::stoi(parts[1]), std::stoi(parts[2]));
+    } else if (parts.size() == 2) {
+        int wh = std::stoi(parts[1]);
+        pimage->set_source(parts[0], wh, wh);
+    } else if (parts.size() == 1) {
+        pimage->set_source(parts[0]);
+    }
 
     return ret;
 }

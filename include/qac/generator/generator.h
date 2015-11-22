@@ -22,6 +22,8 @@ class generator {
 
     void generate(qac::cst_node *root, std::ostream &os);
 
+    virtual void render_image(std::ostream &os, const std::string &source,
+                              int width, int height) = 0;
     virtual void render_bold(std::ostream &os, const std::string &text) = 0;
     virtual void render_underlined(std::ostream &os,
                                    const std::string &text) = 0;
@@ -36,7 +38,8 @@ class generator {
                                           const std::string &text) = 0;
 
     virtual void render_normal_latex(std::ostream &os, const std::string &text);
-    virtual void render_centered_latex(std::ostream &os, const std::string &text);
+    virtual void render_centered_latex(std::ostream &os,
+                                       const std::string &text);
 
     virtual void render_chapter(std::ostream &os, const std::string &caption,
                                 const std::string &questions,
