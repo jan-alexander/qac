@@ -87,6 +87,13 @@ To summarize:
   - `|-` centered cell
   - `|>` right aligned cell
 
+### Images
+
+The keyword to include images is the following: `IMG(source,width,height)`. You
+can use it without the width and height argument, or you can use just one
+number, if your image is quadratic. Please note that there must not be a space
+in this command.
+
 ## Organizing Questions
 
 Questions can be organized into chapters, sections and subsections. It's done like this:
