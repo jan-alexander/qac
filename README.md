@@ -94,6 +94,9 @@ can use it without the width and height argument, or you can use just one
 number, if your image is quadratic. Please note that there must not be a space
 in this command.
 
+Keep in mind to copy all images to Ankis `collection.media` Folder. Read
+http://ankisrs.net/docs/manual.html#importing-media for further details.
+
 ## Organizing Questions
 
 Questions can be organized into chapters, sections and subsections. It's done like this:
