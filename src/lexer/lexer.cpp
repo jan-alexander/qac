@@ -154,7 +154,11 @@ void lexer::lex_line(vector<token> &tokens, const string &line, int line_nr) {
     string trimmed_line = boost::trim_copy(line);
 
     if (boost::starts_with(trimmed_line, TOKEN_COMMENT)) {
-        return;
+        // check if it's an list item, and not a comment
+        string::size_type min_size = TOKEN_COMMENT.size() + 1;
+        if (!(trimmed_line.size() >= min_size && trimmed_line[min_size - 1] == '.')) {
+            return;
+        }
     }
 
     if (trimmed_line.empty()) {
