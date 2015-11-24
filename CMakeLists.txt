@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-project(qac)
+project(qac VERSION 0.2.2 LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 
@@ -46,7 +46,10 @@ set(TEST_SOURCE_FILES
     ${COMMON_SOURCE_FILES}
 )
 
-include_directories(include ${Boost_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIRS} ${GLOG_INCLUDE_DIR})
+set(GENERATED_DIR ${PROJECT_BINARY_DIR}/generated)
+configure_file(${PROJECT_SOURCE_DIR}/qac_config.h.in ${GENERATED_DIR}/qac_config.h)
+
+include_directories(include ${Boost_INCLUDE_DIRS} ${GFLAGS_INCLUDE_DIRS} ${GLOG_INCLUDE_DIR} ${GENERATED_DIR})
 
 add_executable(qac ${QAC_SOURCE_FILES} ${HEADER_FILES})
 target_link_libraries(qac ${GFLAGS_LIBRARY} ${GLOG_LIBRARY})

@@ -10,6 +10,8 @@
 #include <qac/lexer/lexer.h>
 #include <qac/parser/parser.h>
 
+#include "qac_config.h"
+
 using namespace qac;
 using namespace std;
 
@@ -64,7 +66,7 @@ void add_generator(map<string, unique_ptr<generator>> &generator_map,
 }
 
 int main(int argc, char *argv[]) {
-    gflags::SetVersionString("0.2.1 BETA");
+    gflags::SetVersionString(QAC_VERSION);
     gflags::SetUsageMessage("[flags] <qa-file>");
     gflags::ParseCommandLineFlags(&argc, &argv, true);
     google::InitGoogleLogging(argv[0]);
