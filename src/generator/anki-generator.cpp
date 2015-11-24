@@ -11,6 +11,15 @@ string anki_generator::get_name() { return "anki"; }
 
 string anki_generator::get_description() { return "Anki text file generator"; }
 
+void anki_generator::render_image(std::ostream &os, const std::string &source,
+                                  int width, int height) {
+    // strip the folder from the source path
+    std::string::size_type sep_pos = source.rfind('/');
+    html_generator::render_image(
+        os, sep_pos == std::string::npos ? source : source.substr(sep_pos + 1),
+        width, height);
+}
+
 void anki_generator::render_normal_latex(std::ostream &os,
                                          const std::string &text) {
     os << "[$]" << text << "[/$]";

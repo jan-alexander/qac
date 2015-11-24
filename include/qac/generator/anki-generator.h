@@ -11,6 +11,9 @@ class anki_generator : public html_generator {
     virtual std::string get_description() override;
 
    protected:
+    virtual void render_image(std::ostream &os, const std::string &source,
+                              int width, int height) override;
+
     virtual void render_underlined(std::ostream &os,
                                    const std::string &text) override;
 
