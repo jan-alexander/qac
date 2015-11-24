@@ -95,7 +95,9 @@ number, if your image is quadratic. Please note that there must not be a space
 in this command.
 
 Keep in mind to copy all images to Ankis `collection.media` Folder. Read
-http://ankisrs.net/docs/manual.html#importing-media for further details.
+http://ankisrs.net/docs/manual.html#importing-media for further details. Note that
+all folders will be stripped from the image source path when generating Anki
+questions.
 
 ## Organizing Questions
 
