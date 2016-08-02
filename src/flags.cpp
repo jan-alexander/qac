@@ -12,3 +12,4 @@ DEFINE_string(subsection, "Subsection",
               "The word subsection used for rendering.");
 DEFINE_string(question, "Question", "The word question used for rendering.");
 DEFINE_bool(render, true, "Render the content or not.");
+DEFINE_bool(offline, false, "Use local MathJax");

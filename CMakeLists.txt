@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-project(qac VERSION 0.2.2 LANGUAGES CXX)
+project(qac VERSION 0.2.3 LANGUAGES CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/Modules/")
 

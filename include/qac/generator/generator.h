@@ -12,6 +12,7 @@ DECLARE_string(chapter);
 DECLARE_string(section);
 DECLARE_string(subsection);
 DECLARE_string(question);
+DECLARE_bool(offline);
 
 namespace qac {
 

@@ -102,21 +102,26 @@ void html_generator::render_question(std::ostream &os,
 
 void html_generator::render_document(std::ostream &os,
                                      const std::string &body) {
+    std::string font = "        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600' rel='stylesheet' type='text/css'>\n";
+    std::string mathjax_src = "http://cdn.mathjax.org/mathjax/latest/";
+
+    if (FLAGS_offline) {
+        mathjax_src = "MathJax/";
+        font = "";
+    }
+
     os << "<!DOCTYPE html>\n"
        << "<html>\n"
        << "    <head>\n"
        << "        <meta charset=\"utf-8\">\n"
-       << "        <link "
-          "href='https://fonts.googleapis.com/"
-          "css?family=Open+Sans:400,300,600' rel='stylesheet' "
-          "type='text/css'>\n"
+       << font
        << "        <title>Q&As</title>\n"
        << "        <script type=\"text/x-mathjax-config\">\n"
        << "            MathJax.Hub.Config({tex2jax: {inlineMath: "
           "[['\\\\(','\\\\)']]}});\n"
        << "        </script>\n"
        << "        <script type=\"text/javascript\" "
-          "src=\"http://cdn.mathjax.org/mathjax/latest/"
+          "src=\"" << mathjax_src <<
           "MathJax.js?config=TeX-AMS-MML_HTMLorMML\">\n"
        << "        </script>\n"
        << "        <style>\n"
